@@ -2,13 +2,37 @@
 
 Classification: PUBLIC
 Generated: 2026-09-05 (PROMPT 11A §8)
-Reconciled: 2026-10-06 (GitHub Preparation Track v1, gate GP-R5) — inventory completed from disk
-Audit baseline: pnpm-lock.yaml lockfileVersion 9.0, packages as-of Day-1.
+Reconciled: 2026-10-07 (public-state reconciliation after PR #1 merge)
+Audit baseline: committed pnpm-lock.yaml (lockfileVersion 9.0) and the PR #1 public verification surface.
 
 IMPORTANT — this table is populated ONLY with locally-determinable facts.
 No claims of legal compatibility are made. Licenses classified per
 THIRD_PARTY_POLICY.md §License Classification Scheme.
 UNKNOWN rows MUST NOT be pushed to a public remote without HUMAN override.
+
+CURRENT PUBLIC TREE NOTE — 2026-10-07
+
+  The live root devDependency set is:
+    @types/node 22.10.2
+    @webgpu/types 0.1.74
+    rimraf 6.1.3
+    typescript 5.7.2
+    vitest 2.1.9
+
+  The committed lockfile also carries the explicit security overrides:
+    brace-expansion 5.0.12
+    source-map-js 1.2.2
+
+  The FPR-R6D / PR #1 licence verification reported 57 third-party package
+  entries with 0 denied licences:
+    MIT 44, BSD-3-Clause 2, Apache-2.0 2, BlueOak-1.0.0 7, ISC 2.
+
+  Table B below is retained as the earlier GP-R5 provenance snapshot. It is
+  NOT the authoritative current transitive closure after the dependency
+  remediation that preceded PR #1. For the current closure, run the manual
+  License workflow / `pnpm licenses list --json` against the committed
+  frozen lockfile. The historical table is intentionally not rewritten from
+  inference.
 
 GP-R5 RECONCILIATION NOTE — READ BEFORE ACTING ON THIS FILE
 
@@ -50,12 +74,12 @@ Table A — Direct dependencies and non-package material
 | Name | Version | D/T | Upstream URL (from package.json / npm) | SPDX (proposed) | Class | Provenance | Menog Mods? | Status | Approver | Notes
 |---|---|---|---|---|---|---|---|---|---|---|
 | typescript | 5.7.2 | D | https://github.com/microsoft/TypeScript | Apache-2.0 | PERMISSIVE | pnpm-lock integrity sha512; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only build tool; Apache-2.0 widespread. Only .tsbuildinfo is a build artefact; the tsc binary is not redistributed by Menog. |
-| vitest | 2.1.8 | D | https://github.com/vitest-dev/vitest | MIT | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only test runner. Its transitive closure is now COMPLETE — see Table B (rows 1–68). Flagged in the recorded pnpm audit. |
+| vitest | 2.1.9 | D | https://github.com/vitest-dev/vitest | MIT | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only test runner. Its transitive closure is now COMPLETE — see Table B (rows 1–68). Flagged in the recorded pnpm audit. |
 | @types/node | 22.10.2 | D | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | TypeScript type stubs only. No runtime bits shipped. |
-| rimraf | 6.0.1 | D | https://github.com/isaacs/rimraf | ISC | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only clean-script helper. Root of the audit-flagged brace-expansion chain (rimraf>glob>minimatch>brace-expansion). |
+| rimraf | 6.1.3 | D | https://github.com/isaacs/rimraf | ISC | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only clean-script helper. Root of the audit-flagged brace-expansion chain (rimraf>glob>minimatch>brace-expansion). |
 | @webgpu/types | 0.1.74 | D | https://github.com/gpuweb/types | BSD-3-Clause | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | ADDED BY GP-R5. Declared in root package.json devDependencies and present on disk, but absent from the Day-1 table — a factual omission, now recorded. TypeScript type declarations for the WebGPU API only; no runtime bits shipped. BSD-3-Clause is read from the package's own manifest, not asserted as compatible. |
 | node:* stdlib (child_process, fs, crypto, path, os, net, …) | engines >=22.0.0 | implicit | https://github.com/nodejs/node | MIT (Node.js stdlib wrapper license headers) | PERMISSIVE | bundled with Node.js runtime, NOT vendored in repo | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Used via ESM `import from "node:*"`. Package.json declares `engines.node = ">=22.0.0"` (there is no single pinned runtime version; the Day-1 figure "22.15.0" was a point-in-time observation). Node.js runtime itself is not redistributed in the Menog repo. Exactly one governed `node:net` import site exists in production source (`packages/durable-state/src/endpointListenerBoundary.ts`). |
-| MPL-2.0 license text (LICENSE + LICENSES/MPL-2.0.txt) | 2.0 | imported | https://opensource.org/license/mpl-2-0/ + https://mozilla.org/en-US/MPL/2.0/ | MPL-2.0 | WEAK COPYLEFT | Verbatim reproduction of steward text; authority opensource.org; retrieved 2026-09-05 | no | ACCEPTED (license text only; not a code dep) | HUMAN_REVIEW_REQUIRED (ratify choice) | Text of the proposed open-core license; canonical steward text is NOT modified. NOTE: this row records the text's provenance. The CHOICE of MPL-2.0 as Menog's core licence remains PROPOSED and unratified (IP-001). |
+| MPL-2.0 license text (LICENSE + LICENSES/MPL-2.0.txt) | 2.0 | imported | https://opensource.org/license/mpl-2-0/ + https://mozilla.org/en-US/MPL/2.0/ | MPL-2.0 | WEAK COPYLEFT | Verbatim reproduction of steward text; authority opensource.org; retrieved 2026-09-05 | no | ACCEPTED (license text only; not a code dep) | RATIFIED (IP-001, 2026-10-06) | Canonical steward text is not modified. MPL-2.0 is the ratified Menog OS core licence. |
 
 ============================================================
 Table B — Transitive closure (COMPLETE — 68 package-version rows)
@@ -102,7 +126,7 @@ identifier, NOT a compatibility conclusion, and NOT an acceptance.
 | foreground-child | 3.3.1 | T | https://github.com/tapjs/foreground-child | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
 | isexe | 2.0.0 | T | https://github.com/isaacs/isexe | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
 | picocolors | 1.1.1 | T | alexeyraspopov/picocolors | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
-| rimraf | 6.0.1 | D | https://github.com/isaacs/rimraf | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Direct devDependency — see Table A; listed here because pnpm licenses list enumerates it in the closure. |
+| rimraf | 6.1.3 | D | https://github.com/isaacs/rimraf | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Direct devDependency — see Table A; listed here because pnpm licenses list enumerates it in the closure. |
 | siginfo | 2.0.0 | T | https://github.com/emilbayes/siginfo | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
 | signal-exit | 4.1.0 | T | https://github.com/tapjs/signal-exit | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
 | which | 2.0.2 | T | https://github.com/isaacs/node-which | ISC | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
@@ -153,7 +177,7 @@ identifier, NOT a compatibility conclusion, and NOT an acceptance.
 | undici-types | 6.20.0 | T | https://github.com/nodejs/undici | MIT | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
 | vite | 5.4.21 | T | — | MIT | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Flagged in the recorded pnpm audit (see §pnpm audit). Dev-only; not a shipped runtime dependency. |
 | vite-node | 2.1.8 | T | — | MIT | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
-| vitest | 2.1.8 | D | https://github.com/vitest-dev/vitest | MIT | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Direct devDependency — see Table A; listed here because pnpm licenses list enumerates it in the closure. |
+| vitest | 2.1.9 | D | https://github.com/vitest-dev/vitest | MIT | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Direct devDependency — see Table A; listed here because pnpm licenses list enumerates it in the closure. |
 | why-is-node-running | 2.3.0 | T | https://github.com/mafintosh/why-is-node-running | MIT | PERMISSIVE | pnpm-lock integrity; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only transitive dependency of the test/build toolchain. |
 
 ============================================================

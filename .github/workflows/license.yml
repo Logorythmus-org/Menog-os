@@ -1,20 +1,19 @@
 # Menog OS — licence verification (OPTIONAL, manual only)
 #
-# This workflow is deliberately NOT triggered by push or pull_request. It is
-# manual (`workflow_dispatch`) because the first-party licence decision is
-# still open: the public candidate ships with no LICENSE, no LICENSES/ and no
-# .reuse/REUSE.toml, because IP-001 (licence choice) and IP-002 (copyright
-# holder) are unratified. Wiring this into push/PR would guarantee a red check
-# on a question that only a human can decide.
+# Public-state reconciliation (2026-10-07):
+#   * MPL-2.0 and the collective holder label "Menog OS contributors" are ratified.
+#   * LICENSE, LICENSES/, and .reuse/REUSE.toml are present in the public tree.
+#   * This workflow remains manual because first-party artefact presence and the
+#     third-party licence inventory are verification utilities, while remaining
+#     REUSE per-file/schema work and third-party acceptance decisions are tracked
+#     separately. This workflow does not publish, deploy, or grant merge authority.
 #
-# Deliberate authoring choices (GP-R12):
-#   * Actions pinned to a MAJOR version tag chosen from the upstream release
-#     list at authoring time — never @main / @master.
+# Deliberate authoring choices:
+#   * Actions use bounded upstream version tags rather than @main / @master.
 #   * Permissions are read-only. No write token. No secret is consumed.
-#   * No deployment, no release, no registry publishing.
-#   * The third-party check reads pnpm's own inventory, so the cache cannot
-#     change what is verified.
-
+#   * No deployment, release, or registry publishing occurs here.
+#   * The third-party check reads pnpm's installed inventory after a frozen-lockfile install.
+#
 name: License (optional)
 
 on:
@@ -35,21 +34,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-      # Expected to FAIL until IP-001 / IP-002 are ratified. A public
-      # repository with source and no licence grants no reuse rights, so this
-      # failure is the point of the check, not a defect in it.
+      # The ratified first-party licence surface is expected to be present.
+      # Absence of any required artefact is a hard verification failure.
       - name: Require the first-party licence artefacts
         run: |
           missing=0
           for f in LICENSE LICENSES .reuse/REUSE.toml; do
             if [ ! -e "$f" ]; then
-              echo "::error title=Missing licence artefact::${f} is not present (IP-001 / IP-002 unratified)"
+              echo "::error title=Missing licence artefact::${f} is required by the ratified public licence surface"
               missing=1
             fi
           done
           if [ "$missing" -ne 0 ]; then
-            echo "First-party licence artefacts are intentionally absent from the first-push candidate."
-            echo "This job becomes meaningful only after the licence decision is made."
+            echo "Required first-party licence artefacts are missing."
+            echo "The public licence surface is inconsistent; fail closed."
             exit 1
           fi
           echo "First-party licence artefacts present."

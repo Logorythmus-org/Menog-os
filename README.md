@@ -9,11 +9,11 @@ append-only hash-chained ledger, and makes the result inspectable and reproducib
 
 > ## ⚠ Maturity: experimental. Not production software.
 >
-> This repository is a **pre-release experimental implementation**. It has never been committed,
-> tagged, released, deployed or published. There is no CI pipeline, no published package, no
-> release artifact and no support commitment. **No production-readiness, stability, security or
-> compliance certification is claimed, and none should be inferred.** Do not run this against
-> systems or data you cannot afford to lose.
+> This repository is a **public pre-release experimental implementation**. The first canonical
+> public source candidate was merged to `main` on 2026-10-07 through PR #1 after CI and Security
+> checks. There is still **no tagged release, published package, deployment artifact, or support
+> commitment**. **No production-readiness, stability, security, or compliance certification is
+> claimed or should be inferred.** Do not run this against systems or data you cannot afford to lose.
 
 ---
 
@@ -39,7 +39,7 @@ Intent → Verb → Algorithm → Policy → Runtime → Event Ledger → Human 
 ## 2. What is actually implemented today
 
 Verified against the source tree in this repository, not from a roadmap. The workspace is **14
-projects** (13 packages + 1 CLI), **162 TypeScript source files**.
+projects** (13 packages + 1 CLI), **157 TypeScript source files**.
 
 | Package | Role |
 |---|---|
@@ -143,7 +143,7 @@ Stated plainly, because an honest boundary is more useful than an optimistic one
 - **No autonomous root, unrestricted MCP, hidden background agents.**
 - **No commit automation.** Every commit requires manual human review; critical commits require
   explicit human approval.
-- **No CI/CD, no release process, no published packages, no deployment tooling.**
+- **No deployment or release automation.** GitHub CI and dependency-security workflows are present, but there is no package publishing, deployment tooling, or tagged-release automation.
 - **No batch/multi-file atomic mutation** (the never-executed 14C/14E slots).
 - **No Phase 30 spatial runtime.**
 
@@ -154,16 +154,16 @@ Stated plainly, because an honest boundary is more useful than an optimistic one
 - **Language:** TypeScript 5.7.2 — strict, composite build, ESM (`"type": "module"`),
   `noUncheckedIndexedAccess`, `verbatimModuleSyntax`
 - **Package manager:** pnpm 10.11.1 workspaces (frozen lockfile)
-- **Tests:** Vitest 2.1.8 — **141 test files** (96 unit, 34 security, 11 integration)
+- **Tests:** Vitest 2.1.9 — **131 physical `*.test.ts` files** (90 unit, 31 security, 10 integration); the approved public CI surface currently runs 110 test files / 3,031 tests
 - **Runtime:** Node.js — `engines: >=22`; verified on Node `v24.20.0`
 - **Third-party runtime dependencies: 0.** Every package dependency is an internal `workspace:*`
   link; the only external packages are 5 root devDependencies (`@types/node`, `@webgpu/types`,
   `rimraf`, `typescript`, `vitest`). `@webgpu/types` ships ambient type declarations only and is
   used for typing, not for execution.
 
-> The most recent full-suite result recorded in the release evidence is 3,847 tests across 141
-> files. That is a figure from the evidence record, not a claim re-verified here — this README does
-> not assert a green build. Run `pnpm test` and see for yourself.
+> The current public CI baseline is 3,031 tests across 110 test files. The repository physically
+> contains 131 `*.test.ts` files; internal evidence/governance tests excluded by `vitest.config.ts`
+> are not part of the public CI gate. Run `pnpm test` locally to verify the same public surface.
 
 ## 6. Quick start
 
@@ -190,25 +190,25 @@ the target workspace.
 
 ---
 
-## 7. Governance and legal state — no authorization claimed
+## 7. Governance and legal state
 
-This section states facts. It asserts no legal position that has not been ratified.
+This section states the current public repository facts; it does not claim production readiness or
+external certification.
 
-- **Licence: PROPOSED, not ratified.** A `LICENSE` file containing the verbatim MPL-2.0 steward
-  text is present, and decision `IP-001` proposes MPL-2.0 as the open-core licence — but that
-  decision is **PROPOSED**, with approver `HUMAN_REVIEW_REQUIRED`. **No licence grant is asserted
-  by this document.** Treat the code as all-rights-reserved until a holder and licence are ratified.
-- **Copyright holder: unresolved** (`IP-002`). No ownership assertion is made anywhere in this
-  repository, and none should be inferred from it.
-- **Patent review: not completed.** Seven research topics are held as `PATENT-REVIEW` pending human
-  triage (`IP-005`); the associated novelty, prior-art and professional-review material is
-  **internal and withheld** from any public surface by policy.
-- **External contributions: CLOSED** pending a DCO/CLA/hybrid decision (`IP-007`).
-- **Publication: NOT AUTHORIZED.** Commit, push, tag and release are all unauthorized. The
-  publication gate (`docs/governance/PUBLICATION_GATE.md`) has 21 rows, none yet checked, with
-  human sign-off required on every one before any public push.
-- **Professional IP review dispositions:** PR-01 `HUMAN_DISPOSITION_PENDING` · PR-02 `HOLD` ·
-  PR-03 `HUMAN_DISPOSITION_PENDING` · PR-04 `HOLD` · PR-05 `HOLD`.
+- **Core licence: MPL-2.0 — ratified.** The top-level `LICENSE` and
+  `LICENSES/MPL-2.0.txt` carry the canonical licence text.
+- **Copyright holder of record: “Menog OS contributors” — ratified.** This is a collective
+  attribution label, not a claim that a separate legal entity named Menog OS owns the work.
+- **Documentation/config licensing:** CC-BY-4.0 and CC0-1.0 licence texts are present under
+  `LICENSES/`, with path-level metadata recorded in `.reuse/REUSE.toml`.
+- **Patent review is not completed.** Patent-review and professional-review material remains
+  internal and is deliberately withheld from the public source surface.
+- **External contributions remain CLOSED** pending a ratified contributor model. Absence of a
+  `CONTRIBUTING.md` file is intentional at this stage.
+- **Publication state: PUBLIC EXPERIMENTAL SOURCE.** PR #1 was merged to `main` on 2026-10-07.
+  No tag, GitHub Release, npm package, deployment artifact, or production release has been created.
+- **REUSE per-file compliance is not claimed.** The project has licence metadata, but the remaining
+  REUSE schema/header work is tracked separately and must not be inferred as complete.
 - **Compliance:** this is a compliance-*oriented* architecture. **No external certification or
   audit is claimed or implied.**
 
@@ -245,8 +245,11 @@ things about that history are worth stating plainly rather than burying:
 |---|---|
 | Canonical repository | `Logorythmus-org/Menog-os` (public) |
 | Default branch | `main` |
-| Local commits | **0** — history is unborn; the only commit on the remote is a placeholder `README.md` root |
-| Publication | **not authorized** — see §7 |
+| First public merge | PR #1 — 2026-10-07 |
+| CI | Active on pull requests and pushes to `main` |
+| Tagged releases | **None** |
+| Published packages / deployments | **None** |
+| Maturity | **Experimental pre-release source** |
 
-This tree has never been published. Until the governance items in §7 are resolved by a human with
-authority to resolve them, it should be treated as an unpublished working draft.
+This repository is now public. Public availability does **not** imply a tagged release, package
+publication, deployment, support commitment, production readiness, or external certification.
