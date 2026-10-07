@@ -1,0 +1,98 @@
+# Menog OS — licence verification (OPTIONAL, manual only)
+#
+# This workflow is deliberately NOT triggered by push or pull_request. It is
+# manual (`workflow_dispatch`) because the first-party licence decision is
+# still open: the public candidate ships with no LICENSE, no LICENSES/ and no
+# .reuse/REUSE.toml, because IP-001 (licence choice) and IP-002 (copyright
+# holder) are unratified. Wiring this into push/PR would guarantee a red check
+# on a question that only a human can decide.
+#
+# Deliberate authoring choices (GP-R12):
+#   * Actions pinned to a MAJOR version tag chosen from the upstream release
+#     list at authoring time — never @main / @master.
+#   * Permissions are read-only. No write token. No secret is consumed.
+#   * No deployment, no release, no registry publishing.
+#   * The third-party check reads pnpm's own inventory, so the cache cannot
+#     change what is verified.
+
+name: License (optional)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  first-party-licence-presence:
+    name: first-party licence presence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      # Expected to FAIL until IP-001 / IP-002 are ratified. A public
+      # repository with source and no licence grants no reuse rights, so this
+      # failure is the point of the check, not a defect in it.
+      - name: Require the first-party licence artefacts
+        run: |
+          missing=0
+          for f in LICENSE LICENSES .reuse/REUSE.toml; do
+            if [ ! -e "$f" ]; then
+              echo "::error title=Missing licence artefact::${f} is not present (IP-001 / IP-002 unratified)"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "First-party licence artefacts are intentionally absent from the first-push candidate."
+            echo "This job becomes meaningful only after the licence decision is made."
+            exit 1
+          fi
+          echo "First-party licence artefacts present."
+
+  third-party-licences:
+    name: third-party licence inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install with frozen lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Reject unknown or copyleft third-party licences
+        run: |
+          pnpm licenses list --json > "$RUNNER_TEMP/licenses.json"
+          node -e '
+          const fs = require("node:fs");
+          const inventory = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/licenses.json", "utf8"));
+          const DENY = /UNKNOWN|GPL|AGPL|SSPL|BUSL|CPAL|EUPL|OSL|CC-BY-NC|CC-BY-SA/i;
+          let packages = 0;
+          const rejected = [];
+          const counts = {};
+          for (const [licence, entries] of Object.entries(inventory)) {
+            counts[licence] = (counts[licence] || 0) + entries.length;
+            for (const entry of entries) {
+              packages += 1;
+              if (DENY.test(licence)) rejected.push(`${entry.name} :: ${licence}`);
+            }
+          }
+          console.log(`third-party packages: ${packages}`);
+          console.log(`licences: ${JSON.stringify(counts)}`);
+          if (rejected.length > 0) {
+            console.error("rejected licences:");
+            for (const r of rejected) console.error(`  ${r}`);
+            process.exit(1);
+          }
+          console.log("no unknown or copyleft third-party licences found");
+          '

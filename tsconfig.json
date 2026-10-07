@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/verbs" },
+    { "path": "./packages/shared" },
+    { "path": "./packages/algorithms" },
+    { "path": "./packages/semantiq" },
+    { "path": "./packages/core" },
+    { "path": "./packages/agents" },
+    { "path": "./packages/event-ledger" },
+    { "path": "./packages/policy" },
+    { "path": "./packages/runtime-linux" },
+    { "path": "./packages/planner" },
+    { "path": "./packages/commit-engine" },
+    { "path": "./packages/memory" },
+    { "path": "./packages/durable-state" },
+    { "path": "./apps/cli" },
+    { "path": "./tests" }
+  ]
+}

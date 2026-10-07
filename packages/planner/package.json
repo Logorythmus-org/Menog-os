@@ -1,0 +1,24 @@
+{
+  "name": "@menog/planner",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MPL-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@menog/core": "workspace:*",
+    "@menog/verbs": "workspace:*",
+    "@menog/shared": "workspace:*",
+    "@menog/policy": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.7.2",
+    "@types/node": "22.10.2"
+  }
+}

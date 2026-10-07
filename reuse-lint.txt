@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<PYTHON_PREFIX>/Scripts/reuse.exe\__main__.py", line 5, in <module>
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\core.py", line 1462, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\core.py", line 1383, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\core.py", line 1850, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\core.py", line 1246, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\core.py", line 814, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\decorators.py", line 46, in new_func
+    return f(get_current_context().obj, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX>/Lib/site-packages\reuse\cli\lint.py", line 125, in lint
+    click.echo(format_plain(report), nl=False)
+  File "<PYTHON_PREFIX>/Lib/site-packages\click\utils.py", line 321, in echo
+    file.write(out)  # type: ignore
+    ^^^^^^^^^^^^^^^
+  File "<PYTHON_PREFIX> line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2190' in position 310: character maps to <undefined>

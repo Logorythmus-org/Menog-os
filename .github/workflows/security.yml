@@ -1,0 +1,123 @@
+# Menog OS — dependency / security scanning
+#
+# Scope: dependency advisories for a local-first, zero-trust runtime.
+#
+# Deliberate authoring choices (GP-R12):
+#   * Actions pinned to a MAJOR version tag chosen from the upstream release
+#     list at authoring time — never @main / @master.
+#   * Permissions are read-only. No write token, so no SARIF upload and no
+#     pull-request commenting; findings are read from the job log.
+#   * No repository secret is consumed. No deployment, no release, no registry
+#     publishing.
+#   * `pnpm audit` reads the committed lockfile, so it runs without installing
+#     and without a cache — nothing here can alter lockfile semantics.
+#
+# TWO JOBS ON PURPOSE — they are not the same gate:
+#   * `dependencies-runtime` audits PRODUCTION dependencies only and is the
+#     blocking release-security gate.
+#   * `dependencies-development` audits the full tree including devDependencies.
+#     FPR-R6D/FPR-R8 records 9 current advisories, all dev-only through the
+#     Vitest toolchain (5 moderate, 1 high, 3 critical). That debt remains fully
+#     visible in logs and the job summary, but does not represent a production
+#     dependency path and is informational for this first public candidate.
+#   Operational audit failures still fail closed; known advisory exit code 1 is
+#   reported without turning the whole PR red.
+#
+# SECRET SCANNING IS NOT WIRED IN HERE, deliberately. The canonical pattern
+# list for this repository lives inside scripts/verify-local.mjs, which runs
+# the whole local verification suite; the tree also contains 9 intentional,
+# non-functional secret fixtures. Turning those into a blocking CI secret scan
+# requires a human allowlist decision about the fixtures, so the scan is left
+# to `node scripts/verify-local.mjs` for now. This is a documented omission,
+# not an oversight.
+
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, Mondays 06:00 UTC — catches advisories published after a merge.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  dependencies-runtime:
+    name: dependencies (runtime)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Audit production dependencies
+        run: pnpm audit --prod
+
+  dependencies-development:
+    name: dependencies (development)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Audit all dependencies (including devDependencies; informational)
+        run: |
+          set +e
+          pnpm audit 2>&1 | tee /tmp/menog-dev-audit.txt
+          audit_rc=${PIPESTATUS[0]}
+          pnpm audit --json > /tmp/menog-dev-audit.json 2>/tmp/menog-dev-audit-json.err
+          json_rc=$?
+          set -e
+
+          # pnpm audit returns 1 when advisories are present. Any larger exit
+          # code is treated as an operational failure and remains blocking.
+          if [ "$audit_rc" -gt 1 ]; then
+            echo "pnpm audit failed operationally with exit code $audit_rc" >&2
+            exit "$audit_rc"
+          fi
+
+          counts="$(node -e '
+            const fs = require("fs");
+            try {
+              const j = JSON.parse(fs.readFileSync("/tmp/menog-dev-audit.json", "utf8"));
+              const v = (j.metadata && j.metadata.vulnerabilities) || {};
+              process.stdout.write(JSON.stringify(v));
+            } catch (e) {
+              process.stderr.write(String(e) + "\n");
+              process.exit(2);
+            }
+          ')"
+
+          {
+            printf '%s\n' "### Development dependency audit — informational"
+            printf '\n'
+            printf '%s\n' "- pnpm audit exit code: $audit_rc"
+            printf '%s\n' "- pnpm audit --json exit code: $json_rc"
+            printf '%s\n' "- advisory counts: $counts"
+            printf '%s\n' "- FPR-R6D/FPR-R8 classification: current 9 findings are dev-only through the Vitest toolchain."
+            printf '%s\n' "- Production dependency audit is a separate hard-blocking job."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit 0
