@@ -111,13 +111,13 @@ jobs:
           ')"
 
           {
-            echo "### Development dependency audit — informational"
-            echo
-            echo "- `pnpm audit` exit code: `$audit_rc`"
-            echo "- `pnpm audit --json` exit code: `$json_rc`"
-            echo "- advisory counts: `$counts`"
-            echo "- FPR-R6D/FPR-R8 classification: current 9 findings are dev-only through the Vitest toolchain."
-            echo "- Production dependency audit is a separate hard-blocking job."
+            printf '%s\n' "### Development dependency audit — informational"
+            printf '\n'
+            printf '%s\n' "- pnpm audit exit code: $audit_rc"
+            printf '%s\n' "- pnpm audit --json exit code: $json_rc"
+            printf '%s\n' "- advisory counts: $counts"
+            printf '%s\n' "- FPR-R6D/FPR-R8 classification: current 9 findings are dev-only through the Vitest toolchain."
+            printf '%s\n' "- Production dependency audit is a separate hard-blocking job."
           } >> "$GITHUB_STEP_SUMMARY"
 
           exit 0
