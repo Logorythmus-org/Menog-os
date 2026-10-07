@@ -11,10 +11,12 @@
 > - **The workspace is now 14 projects (13 packages + a CLI)**, not the Day-1 set — see
 >   `docs/ARCHITECTURE_BASELINE.md`'s layout, which is likewise a v0 snapshot.
 > - **The "151 tests total" figure in the scope section is a Day-1-era count.** The repository now
->   holds **141 test files** (96 unit / 34 security / 11 integration) across Phases 12–29.
+>   holds **131 physical `*.test.ts` files** (90 unit / 31 security / 10 integration); the approved
+>   public CI surface runs 110 test files / 3,031 tests.
 >
-> Retained rather than rewritten, because it is a dated baseline record. For current truth see
-> [`README.md`](../README.md) and [`CURRENT_STATE.md`](../CURRENT_STATE.md).
+> Retained rather than rewritten, because it is a dated baseline record. For current public
+> truth see [`README.md`](../README.md) and [`PROJECT_SETUP.md`](../PROJECT_SETUP.md). The detailed
+> internal state/audit record is intentionally withheld from the public source tree.
 >
 > One row below is still accurate: the **16 `CapabilityId`** count matches the source today.
 

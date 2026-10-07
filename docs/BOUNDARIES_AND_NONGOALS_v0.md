@@ -169,4 +169,5 @@ only:
   (PROJECT_BASELINE, ARCHITECTURE_BASELINE, SECURITY_BASELINE, VERB_REGISTRY_v0,
    ALGORITHM_REGISTRY_v0, EVENT_SCHEMA_v0, LINUX_RUNTIME_CONTRACT,
    DAY1_ACCEPTANCE_CRITERIA)
-- Ground truth audit: `CURRENT_STATE.md`
+- Current public truth: [`README.md`](../README.md) and [`PROJECT_SETUP.md`](../PROJECT_SETUP.md).
+- Detailed internal state/audit records are retained outside the public source tree.
