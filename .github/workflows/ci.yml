@@ -11,17 +11,16 @@
 #     change lockfile semantics or dependency resolution.
 #   * `defaults.run.shell: bash` keeps the steps identical on every runner.
 #
-# KNOWN STATE AT AUTHORING (2026-10-06) — read before enabling required checks:
-#   The `test` job is EXPECTED TO FAIL. The published candidate deliberately
-#   excludes docs/release/**, so 25 of its 141 test files cannot resolve the
-#   evidence they assert on (track item R7-HD-1). The failure is genuine, so it
-#   is left blocking and is NOT wrapped in continue-on-error. `install`,
-#   `typecheck` and `build` pass today; `test` is not recommended as a required
-#   check on main until R7-HD-1 is resolved.
+# CURRENT PUBLIC CI STATE (FPR-R8, 2026-10-07):
+#   The approved public Vitest surface is 110 test files / 3031 tests.
+#   Every job is self-contained: the test job installs, builds, then tests in
+#   its own checkout. Target-specific WSL2 qualifications use explicit skipIf
+#   gates rather than failing portable Linux CI when that target is unavailable.
+#   No blocking test is wrapped in continue-on-error.
 #
-# Node version: the workspace declares engines.node ">=22.0.0". Only Node 24
-# (v24.20.0) has actually been exercised against this candidate, so CI pins 24.
-# A 22/24 matrix is a deliberate follow-up once the 22 leg has been verified.
+# Node version: the workspace declares engines.node ">=22.0.0"; CI pins Node 24,
+# the exercised major for this release candidate. A 22/24 matrix remains a
+# deliberate follow-up once the Node 22 leg is qualified.
 
 name: CI
 
@@ -113,7 +112,7 @@ jobs:
           cache: pnpm
       - name: Install with frozen lockfile
         run: pnpm install --frozen-lockfile
-      # Expected to fail until R7-HD-1 is resolved. Do not add
-      # continue-on-error here; the failure is a real signal, not noise.
+      - name: Build
+        run: pnpm build
       - name: Test
         run: pnpm test

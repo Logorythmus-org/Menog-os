@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sep } from "node:path";
+import { join, resolve } from "node:path";
 import {
   TOOL_RUNTIME_CONTRACT_SCHEMA_VERSION,
   TOOL_BASELINE_PROFILE_ID,
@@ -266,7 +266,7 @@ describe("21C junction — deny paths never reach the transport", () => {
 
 // ── spec assembly: the double records exactly what the junction derived ──────
 
-const WS_ROOT = process.platform === "win32" ? "C:\\menog-ws-21c" : "/tmp/menog-ws-21c";
+const WS_ROOT = resolve("/tmp/menog-ws-21c");
 
 describe("21C junction — launcher spec assembly", () => {
   it("assembles exact executable, argv, cwd, timeout, and env from the authorities", () => {
@@ -298,7 +298,7 @@ describe("21C junction — launcher spec assembly", () => {
     if (!spec) throw new Error("transport was not called");
     expect(spec.targetArgv).toEqual(["/opt/tools/demo-count", "--lines", "3"]);
     // Exact containment: workspace root prefix + requested sub-path.
-    expect(spec.cwd).toBe(WS_ROOT + sep + "sub" + sep + "dir");
+    expect(spec.cwd).toBe(join(WS_ROOT, "sub", "dir"));
     expect(spec.timeoutMs).toBe(5_000);
     expect(spec.maxOutputBytes).toBe(4_000);
     expect(spec.envAllowlist).toEqual(["MENOG_MODE"]);
@@ -347,13 +347,12 @@ describe("21C junction — launcher spec assembly", () => {
 
 describe("21C transport primitives", () => {
   it("cwd canonicalization refuses escapes and accepts workspace-inside paths", () => {
-    // Host-side: resolve() yields Windows-style paths; containment semantics
-    // are separator-correct on both platforms.
-    expect(canonicalToolCwd(undefined, "C:\\tmp\\ws")).toBe("C:\\tmp\\ws");
-    expect(canonicalToolCwd("sub", "C:\\tmp\\ws")).toBe("C:\\tmp\\ws\\sub");
-    expect(canonicalToolCwd("/etc", "/tmp/ws")).toBeNull();
-    expect(canonicalToolCwd("../../../etc", "/tmp/ws")).toBeNull();
-    expect(canonicalToolCwd("/tmp/ws-other", "/tmp/ws")).toBeNull();
+    const root = resolve("/tmp/ws");
+    expect(canonicalToolCwd(undefined, root)).toBe(root);
+    expect(canonicalToolCwd("sub", root)).toBe(join(root, "sub"));
+    expect(canonicalToolCwd(resolve(root, "..", "etc"), root)).toBeNull();
+    expect(canonicalToolCwd(join("..", "..", "etc"), root)).toBeNull();
+    expect(canonicalToolCwd(resolve(root + "-other"), root)).toBeNull();
   });
 
   it("env building: fixed safe defaults + allowlisted names from the trusted source", () => {

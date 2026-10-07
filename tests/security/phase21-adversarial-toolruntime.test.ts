@@ -1,6 +1,7 @@
 import { describe, it, expect, afterAll } from "vitest";
-import { writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { isAbsolute, join, relative, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import {
   TOOL_RUNTIME_CONTRACT_SCHEMA_VERSION,
@@ -13,6 +14,7 @@ import {
   executeSkillRun,
   explainToolRun,
   verifyToolRunRecord,
+  canonicalToolCwd,
   type ToolExecutionRequest,
   type IsolationCapabilitySnapshot,
   type LauncherToolSpec,
@@ -73,6 +75,20 @@ const SNAPSHOT: IsolationCapabilitySnapshot = {
 const NEVER_CALLED_TRANSPORT = (): never => {
   throw new Error("TRANSPORT_REACHED");
 };
+
+const IS_WSL_HOST = (() => {
+  if (process.platform === "win32") {
+    return spawnSync("wsl.exe", ["-l", "-v"], { encoding: "utf8", timeout: 15_000 }).status === 0;
+  }
+  if (process.platform !== "linux") return false;
+  try {
+    return /microsoft|wsl/i.test(readFileSync("/proc/sys/kernel/osrelease", "utf8"));
+  } catch {
+    return false;
+  }
+})();
+
+const cwdFixtureCleanup: string[] = [];
 
 function makeTransport(): { transport: (s: LauncherToolSpec) => LauncherToolResult; calls: LauncherToolSpec[] } {
   const calls: LauncherToolSpec[] = [];
@@ -356,7 +372,39 @@ describe("21F — input & filesystem attacks", () => {
 
   it("A21-06 cwd/path/symlink escape attempts", () => {
     const registry = buildRegistry();
-    for (const cwd of ["/etc", "../../../etc", "/tmp/menog-ws-21f-symlink", "..\\..\\windows"]) {
+    const workspaceRoot = mkdtempSync(join(tmpdir(), "menog-ws-21f-"));
+    const outsideRoot = mkdtempSync(join(tmpdir(), "menog-outside-21f-"));
+    const siblingLink = workspaceRoot + "-symlink";
+    const insideLink = join(workspaceRoot, "inside-to-outside");
+
+    cwdFixtureCleanup.push(workspaceRoot, outsideRoot);
+
+    const linkType = process.platform === "win32" ? "junction" : "dir";
+    let siblingLinkCreated = false;
+    let insideLinkCreated = false;
+    try {
+      symlinkSync(outsideRoot, siblingLink, linkType);
+      siblingLinkCreated = true;
+      cwdFixtureCleanup.push(siblingLink);
+    } catch {
+      // Symlink creation can be unavailable on locked-down Windows hosts.
+    }
+    try {
+      symlinkSync(outsideRoot, insideLink, linkType);
+      insideLinkCreated = true;
+    } catch {
+      // Real-path enforcement is qualified separately by the live launcher suite.
+    }
+
+    const denied = [
+      outsideRoot,
+      join("..", "..", "etc"),
+      join("inside", "..", "..", "outside"),
+      ...(siblingLinkCreated ? [siblingLink] : []),
+      ...(process.platform === "win32" ? ["..\\..\\windows"] : []),
+    ];
+
+    for (const cwd of denied) {
       const o = executeToolRun({
         request: request({
           envelope: {
@@ -366,24 +414,47 @@ describe("21F — input & filesystem attacks", () => {
           },
         }),
         entry: entry(registry), snapshot: SNAPSHOT,
-        workspaceRoot: "/tmp/menog-ws-21f", policyOutcome: "allow",
+        workspaceRoot, policyOutcome: "allow",
         transportOverride: NEVER_CALLED_TRANSPORT,
       } as never);
       if (o.decision.status !== "validation_denied" || o.result !== null) {
         record({
           attack_id: "A21-06", prerequisite: "agent-controlled cwd",
           boundary: "cwd canonicalization against the authorized root",
-          process_started: false, side_effect: "none", cleanup: "n/a",
+          process_started: false, side_effect: "none", cleanup: "afterAll fixture cleanup",
           evidence_ref: "cwd:" + cwd, result: "FAIL",
         });
         return;
       }
     }
+
+    // On POSIX a backslash is an ordinary filename byte, not a path separator.
+    // The Windows-shaped payload therefore cannot escape by construction; prove
+    // containment rather than pretending the grammar is portable.
+    if (process.platform !== "win32") {
+      const c = canonicalToolCwd("..\\..\\windows", workspaceRoot);
+      expect(c).not.toBeNull();
+      if (c !== null) {
+        const rel = relative(workspaceRoot, c);
+        expect(rel.startsWith("..") || isAbsolute(rel)).toBe(false);
+      }
+    }
+
+    // Host-side cwd canonicalization is lexical. If an inside symlink exists,
+    // the returned cwd must still be lexically inside the workspace. The real
+    // path binding is separately proven by the WSL2 launcher/Landlock suite.
+    if (insideLinkCreated) {
+      expect(canonicalToolCwd("inside-to-outside", workspaceRoot)).toBe(resolve(workspaceRoot, "inside-to-outside"));
+    }
+
     record({
       attack_id: "A21-06", prerequisite: "agent-controlled cwd",
       boundary: "cwd canonicalization + (live) Landlock real-path binding",
-      process_started: false, side_effect: "none", cleanup: "n/a",
-      evidence_ref: "4 payloads rejected",
+      process_started: false, side_effect: "none", cleanup: "afterAll fixture cleanup",
+      evidence_ref:
+        "denied:" + denied.length +
+        ";sibling-symlink:" + siblingLinkCreated +
+        ";inside-symlink:" + insideLinkCreated,
       result: "PASS",
     });
   });
@@ -530,19 +601,10 @@ describe("21F — evidence attacks", () => {
     });
   });
 
-  it("A21-09 timeout/child survival — live WSL2 (real launcher, floor profile)", { timeout: 200_000 }, () => {
-    const HAS_WSL =
-      process.platform === "win32" &&
-      spawnSync("wsl.exe", ["-l", "-v"], { encoding: "utf8", timeout: 15_000 }).status === 0;
-    if (!HAS_WSL) {
-      record({
-        attack_id: "A21-09", prerequisite: "WSL2 target for live attack",
-        boundary: "launcher deadline + group cleanup",
-        process_started: false, side_effect: "none", cleanup: "n/a",
-        evidence_ref: "no-target", result: "UNSUPPORTED_ON_TARGET",
-      });
-      return;
-    }
+  it.skipIf(!IS_WSL_HOST)(
+    "A21-09 timeout/child survival — live WSL2 (real launcher, floor profile)",
+    { timeout: 200_000 },
+    () => {
     // Re-prove through the tool path: sleep 300 with a 4s floor deadline.
     const script = [
       "set -e",
@@ -565,7 +627,8 @@ describe("21F — evidence attacks", () => {
       evidence_ref: "tests/security/phase21-tool-live.test.ts timeout case; probe:" + probe,
       result: probe === "referenced" ? "PASS" : "INCONCLUSIVE",
     });
-  });
+    }
+  );
 });
 
 // ── skill-layer attacks ──────────────────────────────────────────────────────
@@ -619,6 +682,14 @@ describe("21F — skill-layer attacks", () => {
 // ── machine-readable evidence artifact ───────────────────────────────────────
 
 afterAll(() => {
+  for (const p of [...cwdFixtureCleanup].reverse()) {
+    try {
+      rmSync(p, { recursive: true, force: true });
+    } catch {
+      // Cleanup failure must not rewrite the security verdict.
+    }
+  }
+
   const dir = join(process.cwd(), "tests", "fixtures", "phase21");
   mkdirSync(dir, { recursive: true });
   const pass = results.filter((r) => r.result === "PASS").length;
