@@ -6,15 +6,15 @@
 #
 # IMPORTANT:
 # - COPYRIGHT_HOLDER_OF_RECORD_DAY1 = "Menog OS contributors" (ratified
-#   2026-10-06; see COPYRIGHT_POLICY.md §Resolved Holder and
-#   IP_DECISION_LOG.md entries IP-001 / IP-002). The label is a collective
-#   attribution and names no legal entity, so it asserts no corporate
-#   ownership.
+#   2026-10-06). The detailed COPYRIGHT_POLICY / IP_DECISION_LOG records are
+#   retained internal governance evidence and are not shipped in the public
+#   tree. The label is a collective attribution and names no legal entity, so
+#   it asserts no corporate ownership.
 # - The annotations below are the REUSE-native declaration of the holder for
 #   paths that cannot carry an in-file header. In-file
 #   `SPDX-FileCopyrightText:` headers on existing Menog source files are
-#   STILL NOT applied: SPDX_REUSE_POLICY.md §Mass-Edit Gating Conditions
-#   requires an explicit human message "APPLY SPDX HEADERS" for that step.
+#   STILL NOT applied. The retained internal SPDX/REUSE policy requires an
+#   explicit human message "APPLY SPDX HEADERS" before that mass edit.
 
 version = 1
 
@@ -44,10 +44,10 @@ SPDX-License-Identifier = "CC0-1.0"
 Menog-IP-Classification = "PUBLIC"
 Menog-Provenance = "Canonical text from https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt. Retrieved 2026-10-06. This file is NOT an original Menog work."
 
-# --- Menog-authored files: NO COPYRIGHT ASSERTION until holder is ratified ---
-# The sections below intentionally omit FileCopyrightText for Menog code/docs.
-# They only record the PROPOSED license identifier for lint purposes.
-# Any automated lint run will flag "missing copyright" — expected until ratification.
+# --- Menog-authored files: ratified collective attribution + licence metadata ---
+# The sections below record the ratified holder label and path-level licence metadata.
+# This file does not claim complete REUSE 3.3 compliance; schema/header migration remains
+# a separately tracked task.
 
 [annotations."packages/**/*.ts"]
 SPDX-FileCopyrightText = "© 2026 Menog OS contributors"

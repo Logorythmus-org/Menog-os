@@ -6,9 +6,9 @@ Reconciled: 2026-10-07 (public-state reconciliation after PR #1 merge)
 Audit baseline: committed pnpm-lock.yaml (lockfileVersion 9.0) and the PR #1 public verification surface.
 
 IMPORTANT — this table is populated ONLY with locally-determinable facts.
-No claims of legal compatibility are made. Licenses classified per
-THIRD_PARTY_POLICY.md §License Classification Scheme.
-UNKNOWN rows MUST NOT be pushed to a public remote without HUMAN override.
+No claims of legal compatibility are made. Licences were classified under the retained internal `THIRD_PARTY_POLICY.md`
+process. That governance record is intentionally not part of the public source
+tree. UNKNOWN rows MUST NOT be published without explicit human override.
 
 CURRENT PUBLIC TREE NOTE — 2026-10-07
 
@@ -54,8 +54,9 @@ GP-R5 RECONCILIATION NOTE — READ BEFORE ACTING ON THIS FILE
   combination". That human sign-off has not happened. This file remains
   an input to that decision, not the decision.
 
-See also: pnpm-lock.yaml, root package.json `devDependencies`,
-THIRD_PARTY_POLICY.md for full acceptance pipeline.
+Public verification inputs: [`pnpm-lock.yaml`](pnpm-lock.yaml), root
+[`package.json`](package.json), and the manual License workflow. The fuller
+third-party acceptance policy is retained as internal governance evidence.
 
 ============================================================
 Row Legend

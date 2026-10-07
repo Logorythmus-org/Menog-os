@@ -1230,8 +1230,9 @@ function wireSocket(
   );
   if (!opened.ok) throw new Error(`open refused: ${opened.code} — ${opened.explanation}`);
   socket.on("data", (chunk) => {
-    if (opts.raw !== undefined) opts.raw.push(Buffer.from(chunk));
-    const result = opened.session.ingest(chunk, Date.now());
+    const bytes = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
+    if (opts.raw !== undefined) opts.raw.push(Buffer.from(bytes));
+    const result = opened.session.ingest(bytes, Date.now());
     if (result.ok) {
       for (const payload of result.delivered) opts.received.push(payload);
     }

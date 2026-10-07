@@ -4,7 +4,9 @@ Classification: PUBLIC (SECURITY.md)
 Generated: 2026-09-05 (PROMPT 11A §13)
 Status: ACTIVE MINIMAL POLICY. No security contact channel is established yet
 — see §Reporting, which states that plainly rather than advertising a
-channel that does not work.
+channel that does not work. Detailed disclosure/classification governance
+records referenced historically below are retained outside the public tree;
+this `SECURITY.md` is the operative public reporting policy.
 
 ============================================================
 Scope
@@ -61,7 +63,7 @@ and disclosure timeline.
   ├──────────────────────────────────────────────────────────────┤
   │ Agent Containment   Bypass of the deny-by-default policy     │
   │   Bypass              engine, AuthoritativeExecGate,         │
-  │                       capability allowlist, workpace         │
+  │                       capability allowlist, workspace         │
   │                       sandbox (resolveWorkspaceSafely,       │
   │                       shell metachar filters).                │
   │                       SECURITY-EMBARGOED.                     │
@@ -184,8 +186,8 @@ against good-faith researchers who:
 Relationship to SECURITY_DISCLOSURE_POLICY.md
 ============================================================
 
-This file is the end-user-facing short policy. The complete
-IP/disclosure-classification workflow is documented in
-docs/governance/SECURITY_DISCLOSURE_POLICY.md together with
-the SECURITY-EMBARGOED disclosure class defined in
-IP_CLASSIFICATION_POLICY.md.
+This file is the operative public reporting policy. The more detailed
+`SECURITY_DISCLOSURE_POLICY.md` and `IP_CLASSIFICATION_POLICY.md` records are
+retained as internal governance evidence and are intentionally not shipped in
+this public source tree. Their absence here does not create an alternate public
+reporting channel; use §Reporting above.

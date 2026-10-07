@@ -8,8 +8,9 @@
 > `@menog/commit-engine`, `@menog/semantiq` and `@menog/durable-state`, which did not exist when
 > this was written.
 >
-> Retained rather than rewritten, because it is a dated baseline record. For current truth see
-> [`README.md`](../README.md) and [`CURRENT_STATE.md`](../CURRENT_STATE.md).
+> Retained rather than rewritten, because it is a dated baseline record. For current public
+> truth see [`README.md`](../README.md) and [`PROJECT_SETUP.md`](../PROJECT_SETUP.md). The detailed
+> internal state/audit record is intentionally not part of the public repository.
 
 ## 1. Minimal Phase-0 architecture
 
