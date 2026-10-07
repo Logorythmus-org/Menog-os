@@ -108,12 +108,18 @@ as any other change.
 
 ## 6. External contributions
 
-External contributions remain closed until the contributor model is ratified.
-This repository therefore intentionally does not treat the existence of public
-source as an invitation to submit patches.
+External contributions are open under the public contribution model in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md).
 
-When the contributor model changes, `CONTRIBUTING.md`, review requirements,
-CODEOWNERS, and community templates must be updated as a separate governance change.
+The repository distinguishes a fast path for low-risk documentation/tests/tooling work
+from a core-change path for policy, authority, isolation, cryptography, federation trust,
+runtime execution, evidence semantics, and other high-impact boundaries.
+
+`.github/CODEOWNERS` routes review for high-impact paths. Code ownership does not
+grant autonomous merge authority and does not replace CI, Security, or maintainer review.
+
+AI-assisted contributions are permitted when material assistance and human verification
+are disclosed in the pull request.
 
 ## 7. Release boundary
 

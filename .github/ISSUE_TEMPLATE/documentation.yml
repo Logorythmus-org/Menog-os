@@ -1,0 +1,26 @@
+name: Documentation improvement
+description: Improve public documentation or contributor guidance
+title: "[Docs]: "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Documentation area
+      description: Which file, section, example, or workflow is confusing or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: improvement
+    attributes:
+      label: Proposed improvement
+    validations:
+      required: true
+  - type: checkboxes
+    id: truth
+    attributes:
+      label: Accuracy
+      options:
+        - label: The proposal does not intentionally add unsupported capability, adoption, release, or validation claims.
+          required: true

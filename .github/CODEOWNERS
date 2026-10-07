@@ -1,0 +1,14 @@
+# Default ownership
+* @kaveh8866
+
+# Repository governance and CI
+/.github/ @kaveh8866
+/SECURITY.md @kaveh8866
+/GOVERNANCE.md @kaveh8866
+/CONTRIBUTING.md @kaveh8866
+
+# High-impact authority / trust paths
+/packages/policy/ @kaveh8866
+/packages/runtime-linux/ @kaveh8866
+/packages/event-ledger/ @kaveh8866
+/packages/durable-state/ @kaveh8866
