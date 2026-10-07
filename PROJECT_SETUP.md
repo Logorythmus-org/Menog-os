@@ -1,7 +1,6 @@
 # Menog OS — Project Setup
 
-Canonical project configuration. Fields are filled only where the value is **factual**. Nothing in
-this file grants or implies permission to publish.
+Canonical public project configuration after the first public merge.
 
 ```text
 ORGANIZATION=Logorythmus-org
@@ -9,57 +8,66 @@ REPOSITORY_NAME=Menog-os
 MENOG_REPO_URL=https://github.com/Logorythmus-org/Menog-os
 REMOTE_SSH_URL=git@github.com:Logorythmus-org/Menog-os.git
 DEFAULT_BRANCH=main
-CANONICAL_REMOTE_HEAD=4b03d2c559564ac2045fcbeeb2c26b01ffa6bae7
 
 LANGUAGE=TypeScript
 PACKAGE_MANAGER=pnpm@10.11.1
 NODE_VERSION=>=22.0.0
-NODE_VERSION_VERIFIED=v24.20.0
-PNPM_VERSION=10.11.1
+CI_NODE_MAJOR=24
 
 PUBLIC_REPOSITORY=true
-LICENSE_DECISION=PENDING
-SEMANTIQ_INTEGRATION=OPTIONAL_LATER
+PUBLICATION_STATE=PUBLIC_EXPERIMENTAL_SOURCE
+CORE_LICENSE=MPL-2.0
+COPYRIGHT_HOLDER_OF_RECORD=Menog OS contributors
+SEMANTIQ_INTEGRATION=OPTIONAL_EXTERNAL
 
-COMMIT_AUTHORIZED=false
-PUSH_AUTHORIZED=false
-PUBLICATION_AUTHORIZED=false
+TAGGED_RELEASE=false
+PUBLISHED_PACKAGE=false
+DEPLOYED_ARTIFACT=false
 ```
 
-## Notes on each field
+## Canonical repository rule
 
-- `ORGANIZATION` / `REPOSITORY_NAME` / `MENOG_REPO_URL` — resolved from the live remote. The
-  repository name is spelled **`Menog-os`** on GitHub (earlier drafts assumed lowercase `menog-os`).
-- `MENOG_LOCAL_PATH` — **removed.** A hard-coded absolute path to the maintainer's machine has no
-  place in a project-setup document and is not recorded anywhere in this repository.
-- `LICENSE_DECISION=PENDING` — deliberately still pending. Decision `IP-001` proposes MPL-2.0 and a
-  `LICENSE` file containing the verbatim steward text is present, but the decision is **PROPOSED**
-  and not ratified, and the copyright holder (`IP-002`) is unresolved. This file must not be read
-  as a licence election. See `docs/governance/IP_DECISION_LOG.md`.
-- `NODE_VERSION=>=22.0.0` — the value the project actually enforces (`package.json` `engines`). The
-  verified development runtime is `v24.20.0`. Earlier versions of this file recorded `22.15.0`,
-  which was a stale snapshot rather than a requirement.
-- Authorization flags are `false`. No gate in the preparation track authorizes commit, push, tag,
-  remote mutation, PR creation or publication. `GP-R13` is a human decision gate; `GP-PUSH` may
-  mutate the remote only after explicit human authorization made *after* `GP-R13`.
+The canonical repository is `Logorythmus-org/Menog-os` and the canonical branch is `main`.
+Do not hard-code a mutable `main` commit SHA into project configuration; resolve the live head at
+the start of any mutation workflow.
 
-## Canonicalization rule
+Any substantive change should descend from the live `main` head verified at execution time.
+Do not import another repository's `.git` directory or replace canonical history.
 
-There must be one clearly documented canonical repository: `Logorythmus-org/Menog-os`.
+## Repository mutation policy
 
-If an older Menog / Agent-OS repository is reused for reference, do **not** merge it blindly. Import
-code only after evidence-based review. No external `.git` directory may ever be imported as
-canonical history — any substantive commit must descend from the live remote `main` head verified at
-execution time.
+Normal development is PR-first:
 
-## Pending human decisions before any first push
+1. verify the live `main` head;
+2. create a bounded branch;
+3. make the smallest reviewable change;
+4. run CI / Security checks;
+5. review the resulting diff and evidence;
+6. merge only after explicit human authorization.
 
-- `LICENSE_DECISION` — which licence to ratify, and who the copyright holder is (`IP-001`, `IP-002`).
-- `ORGANIZATION` legal identity — whether a legal entity named `Logorythmus` exists and can hold
-  copyright. The GitHub *organization slug* is factual; the *legal holder* is not resolved.
-- Contributor model — DCO, CLA or hybrid (`IP-007`); external contributions remain closed until then.
-- Patent-review triage for the seven `PATENT-REVIEW` candidates (`IP-005`).
-- Publication authorization itself (`GP-R13`).
+Direct push to `main`, force-push, tagging, GitHub Releases, package publication, deployment, and
+branch-protection/ruleset changes are separate mutations and are not implied by ordinary PR work.
 
-See `CURRENT_STATE.md` §7 for the full governance table and
-`docs/governance/PUBLICATION_GATE.md` for the 21-row pre-push checklist, none of which is checked.
+## Current governance boundaries
+
+- Core licence: **MPL-2.0 — ratified**.
+- Copyright holder of record: **“Menog OS contributors” — ratified collective attribution label**.
+- External contributions: **closed** until a contributor model is ratified.
+- Patent/professional-review material: retained outside the first public source surface.
+- Public repository status does not imply a tagged release or production-readiness claim.
+
+## Local setup
+
+Use the committed toolchain metadata and frozen lockfile:
+
+```sh
+node scripts/setup-local.mjs
+pnpm typecheck
+pnpm build
+pnpm test
+node scripts/verify-local.mjs
+```
+
+The root `package.json`, `pnpm-lock.yaml`, GitHub workflows, `README.md`, and `SECURITY.md`
+are the public operational references. Internal preparation/freeze records are not part of the
+public repository surface.
