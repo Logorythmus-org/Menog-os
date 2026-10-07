@@ -4,7 +4,6 @@
     "composite": true,
     "rootDir": ".",
     "outDir": "../dist/tests",
-    "baseUrl": ".",
     "paths": {
       "@menog/algorithms": ["../packages/algorithms/src/index.ts"],
       "@menog/semantiq": ["../packages/semantiq/src/index.ts"],

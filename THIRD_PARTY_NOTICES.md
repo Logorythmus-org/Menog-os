@@ -13,10 +13,10 @@ tree. UNKNOWN rows MUST NOT be published without explicit human override.
 CURRENT PUBLIC TREE NOTE — 2026-10-07
 
   The live root devDependency set is:
-    @types/node 22.10.2
+    @types/node 26.6.4
     @webgpu/types 0.1.74
     rimraf 6.1.3
-    typescript 5.7.2
+    typescript 7.0.2
     vitest 2.1.9
 
   The committed lockfile also carries the explicit security overrides:
@@ -74,9 +74,9 @@ Table A — Direct dependencies and non-package material
 
 | Name | Version | D/T | Upstream URL (from package.json / npm) | SPDX (proposed) | Class | Provenance | Menog Mods? | Status | Approver | Notes
 |---|---|---|---|---|---|---|---|---|---|---|
-| typescript | 5.7.2 | D | https://github.com/microsoft/TypeScript | Apache-2.0 | PERMISSIVE | pnpm-lock integrity sha512; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only build tool; Apache-2.0 widespread. Only .tsbuildinfo is a build artefact; the tsc binary is not redistributed by Menog. |
+| typescript | 7.0.2 | D | https://github.com/microsoft/TypeScript | Apache-2.0 | PERMISSIVE | pnpm-lock integrity sha512; npm registry | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only build tool; Apache-2.0 widespread. Only .tsbuildinfo is a build artefact; the tsc binary is not redistributed by Menog. |
 | vitest | 2.1.9 | D | https://github.com/vitest-dev/vitest | MIT | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only test runner. Its transitive closure is now COMPLETE — see Table B (rows 1–68). Flagged in the recorded pnpm audit. |
-| @types/node | 22.10.2 | D | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | TypeScript type stubs only. No runtime bits shipped. |
+| @types/node | 26.6.4 | D | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | TypeScript type stubs only. No runtime bits shipped. |
 | rimraf | 6.1.3 | D | https://github.com/isaacs/rimraf | ISC | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Dev-only clean-script helper. Root of the audit-flagged brace-expansion chain (rimraf>glob>minimatch>brace-expansion). |
 | @webgpu/types | 0.1.74 | D | https://github.com/gpuweb/types | BSD-3-Clause | PERMISSIVE | pnpm-lock integrity; npm | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | ADDED BY GP-R5. Declared in root package.json devDependencies and present on disk, but absent from the Day-1 table — a factual omission, now recorded. TypeScript type declarations for the WebGPU API only; no runtime bits shipped. BSD-3-Clause is read from the package's own manifest, not asserted as compatible. |
 | node:* stdlib (child_process, fs, crypto, path, os, net, …) | engines >=22.0.0 | implicit | https://github.com/nodejs/node | MIT (Node.js stdlib wrapper license headers) | PERMISSIVE | bundled with Node.js runtime, NOT vendored in repo | no | PENDING → HUMAN MUST RATIFY | HUMAN_REVIEW_REQUIRED | Used via ESM `import from "node:*"`. Package.json declares `engines.node = ">=22.0.0"` (there is no single pinned runtime version; the Day-1 figure "22.15.0" was a point-in-time observation). Node.js runtime itself is not redistributed in the Menog repo. Exactly one governed `node:net` import site exists in production source (`packages/durable-state/src/endpointListenerBoundary.ts`). |
