@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from "vitest";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import {
@@ -436,7 +436,7 @@ describe("21F — input & filesystem attacks", () => {
       expect(c).not.toBeNull();
       if (c !== null) {
         const rel = relative(workspaceRoot, c);
-        expect(rel.startsWith("..") || isAbsolute(rel)).toBe(false);
+        expect(rel === ".." || rel.startsWith(".." + sep) || isAbsolute(rel)).toBe(false);
       }
     }
 
