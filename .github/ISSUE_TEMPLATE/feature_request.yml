@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a new capability or improvement
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or runtime problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI / developer experience
+        - Documentation
+        - Tests / reproducibility
+        - Runtime
+        - Policy / capabilities
+        - Memory / ledger
+        - Federation / mesh
+        - GETIG / visualization
+        - CI / security / supply chain
+        - Governance / community
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Authority / security impact
+      description: Could this change execution authority, trust, isolation, secrets, or network boundaries?
+  - type: checkboxes
+    id: search
+    attributes:
+      label: Existing work
+      options:
+        - label: I searched existing issues before opening this request.
+          required: true
