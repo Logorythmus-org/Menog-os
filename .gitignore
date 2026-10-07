@@ -1,0 +1,35 @@
+node_modules/
+.pnpm-store/
+.pnpm/
+.menog/
+dist/
+build/
+out/
+coverage/
+*.log
+.npmrc
+.env
+.env.*
+!/.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!/.vscode/extensions.json
+!/.vscode/settings.json
+.trae/
+.freebuff/
+*.local
+*.tmp
+*.temp
+*.tsbuildinfo
+
+# Internal evidence held out of the public candidate
+docs/release/
+
+# This track's own preparation artefacts (internal by definition)
+docs/github-prep/
+
+# Audit-output directory: candidate manifests and classification evidence
+# that must NOT enter the public candidate root.
+docs/audit-output/

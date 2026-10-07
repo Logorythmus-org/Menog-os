@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "menog-phase24-adversarial-evidence/v0",
+  "gate": "24G",
+  "suite": "tests/unit/federation-adversarial.test.ts",
+  "verdictVocabulary": [
+    "PASS",
+    "FAIL",
+    "UNSUPPORTED",
+    "INCONCLUSIVE"
+  ],
+  "verdictSemantics": "UNSUPPORTED is NOT PASS: recorded when the attack cannot be constructed against any public surface",
+  "cases": [
+    {
+      "caseId": "AFG-01",
+      "attack": "forged identity (fabricated NodeId/fingerprint)",
+      "expectedControl": "refusal at durable peer admission BEFORE any signature evaluation; no signature oracle",
+      "actualResult": "stage=peer_admission failureCode=peer_not_admitted; no receipt, no inbox entry",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-02",
+      "attack": "wrong signature (body of A signed by B's key)",
+      "expectedControl": "refusal at the signature stage via the 24B verifier",
+      "actualResult": "stage=signature failureCode=signature_stage_refused",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-03",
+      "attack": "body tamper (payloadHash mutated after signing)",
+      "expectedControl": "signature covers the canonical body; any mutation refuses",
+      "actualResult": "stage=signature failureCode=signature_stage_refused",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-04",
+      "attack": "stale epoch (older sender epoch after a newer one)",
+      "expectedControl": "the 24A instance-epoch tracker refuses stale senders",
+      "actualResult": "second delivery refused ok=false (epoch freshness control held)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-05",
+      "attack": "replay (same message id delivered twice in-epoch)",
+      "expectedControl": "once-ever message ids: second delivery refuses with zero re-evaluation",
+      "actualResult": "failureCode=replay_detected",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-06",
+      "attack": "duplicate proposal (same proposal id, two distinct signed messages)",
+      "expectedControl": "the record id IS the proposal-id commitment: duplicates refuse durably",
+      "actualResult": "failureCode=proposal_duplicate (stage=durable_admission)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-07",
+      "attack": "downgrade/schema confusion (protocol v0, message schema v9, proposal schema v9)",
+      "expectedControl": "exact-equality protocol/schema pins refuse every downgrade at its own stage",
+      "actualResult": "protocol_mismatch (bus) + contract refusal (message schema) + proposal_schema_mismatch (payload)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-08",
+      "attack": "capability inflation (proposal asks beyond the candidate/agent class)",
+      "expectedControl": "intent-class is inert; capabilities are the LOCAL choice; Day-1 Policy denies the inflated ask",
+      "actualResult": "candidate keeps local-only capabilities; workspace:write denied by Policy; gate refuses local_policy_denial",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-09",
+      "attack": "malicious authenticated peer (shell material smuggled in the payload)",
+      "expectedControl": "transport admission never implies semantic acceptance: closed-shape validation refuses; nothing executes",
+      "actualResult": "bus receipt stands (transport), proposal refused proposal_malformed (unknown field), no proposal record, no execution",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-10",
+      "attack": "quarantine resurrection (terminal peer retries enrollment/admission)",
+      "expectedControl": "quarantined is terminal: every transition attempt refuses; state stays quarantined",
+      "actualResult": "both retries refused; readPeer confirms trustState=quarantined",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-11",
+      "attack": "key substitution (attacker key mounted under A's NodeId tail)",
+      "expectedControl": "the verifier binds the subject's fingerprint CLAIM to the verifying key: mismatch refuses",
+      "actualResult": "stage=signature failureCode=signature_stage_refused (fingerprint_claim_mismatch)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-12",
+      "attack": "lineage tamper (dangling causation id)",
+      "expectedControl": "well-formedness pins: no self-reference, no dups, no dangling causation",
+      "actualResult": "failureCode=lineage_malformed; no receipt, no inbox entry",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-13",
+      "attack": "confused deputy (Policy allow for agent X presented with agent Y's assignment)",
+      "expectedControl": "the fresh-authorization gate binds the Policy decision to the assigned actor",
+      "actualResult": "REPAIRED IN-GATE: gate refused with failureCode=actor_mismatch after policyActorId binding was added (the 24A in-gate-repair precedent); re-proven by tests",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-14",
+      "attack": "direct tool-runtime reach attempt (proposal/candidate → executeToolRun)",
+      "expectedControl": "structural isolation: zero execution/network tokens in federation code; the gate accepts no proposal-only input",
+      "actualResult": "static scan across 6 modules: 0 hits; runtime attempt refused no_local_allocation",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-15",
+      "attack": "old Policy reuse (allow from a previous epoch/window)",
+      "expectedControl": "fresh-action window: reusing an old Policy decision is forbidden",
+      "actualResult": "failureCode=stale_local_policy; fresh evaluation required",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-16",
+      "attack": "registry corruption/recovery (terminal peer across restart)",
+      "expectedControl": "peer facts are durable and terminal: recovery restores quarantined EXACTLY, never resurrects",
+      "actualResult": "post-restart readPeer=quarantined; post-restart transition refused",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-17",
+      "attack": "restart+replay (the exact admitted envelope replayed after restart, empty key directory)",
+      "expectedControl": "durable receipt index + durable proposal index refuse across epochs with zero signature evaluation",
+      "actualResult": "replay_detected (durable receipt guard, no signature evaluation); proposal id still present (durable guard intact)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-18",
+      "attack": "oversized message (envelope > 8192 canonical bytes)",
+      "expectedControl": "pinned byte bounds; refusing to widen is the control",
+      "actualResult": "failureCode=oversize_envelope at envelope_shape",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-19",
+      "attack": "evidence tamper (forged receiverDecision in a durable receipt)",
+      "expectedControl": "append-only kinds reject every rewrite; recovery re-verifies hashes (22E)",
+      "actualResult": "store.persist refused (append-only)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-20",
+      "attack": "concurrent peer-state conflict (same transactionId with conflicting reasons; post-conflict flip-back)",
+      "expectedControl": "no last-writer-wins: duplicate transaction ids resolve as idempotent replay at the ORIGINAL revision; terminal states refuse every flip",
+      "actualResult": "state after conflict is NOT admitted (original revision preserved); flip-back refused",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-21",
+      "attack": "foreign evidence as local authority (foreign anchor offered to the execution gate)",
+      "expectedControl": "foreign anchors are DATA with receiver-judgment fields pinned to local refusal facts; the gate accepts only fresh LOCAL assignment+Policy",
+      "actualResult": "anchor pinned not_admitted/none; gate refused no_local_allocation; no authority transfer exists",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AFG-22",
+      "attack": "super-agent / capability union (merge federation principals' capabilities into one authority)",
+      "expectedControl": "no public surface expresses capability merging: profiles are per-agent local registrations and federation modules expose no merge API",
+      "actualResult": "attack cannot be constructed against any public surface; static scan across 6 modules: 0 merge/union APIs. Recorded UNSUPPORTED — unsupported is NOT PASS",
+      "verdict": "UNSUPPORTED"
+    },
+    {
+      "caseId": "AFG-23",
+      "attack": "alternate durable/network/spawn path (bypass the sanctioned junction or execute off-path)",
+      "expectedControl": "persistence is ONLY the 23B acceptMutation junction; no network or spawn surface exists in any federation module",
+      "actualResult": "attack cannot be constructed: static scan across 6 modules found 0 direct .persist( calls and 0 network/spawn imports. Recorded UNSUPPORTED — unsupported is NOT PASS",
+      "verdict": "UNSUPPORTED"
+    }
+  ],
+  "summary": {
+    "total": 23,
+    "PASS": 21,
+    "FAIL": 0,
+    "UNSUPPORTED": 2,
+    "INCONCLUSIVE": 0
+  },
+  "criticalBypass": false,
+  "repairActions": [
+    "AFG-13 confused deputy: requireFreshLocalAuthorization now binds the LOCAL Policy decision to the assigned agent via policyActorId (in-gate repair, 24A in-gate-repair precedent); re-proven by tests"
+  ],
+  "runFinishedAtEpochMs": 1791366809833
+}

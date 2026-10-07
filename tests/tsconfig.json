@@ -1,0 +1,44 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "../dist/tests",
+    "baseUrl": ".",
+    "paths": {
+      "@menog/algorithms": ["../packages/algorithms/src/index.ts"],
+      "@menog/semantiq": ["../packages/semantiq/src/index.ts"],
+      "@menog/verbs": ["../packages/verbs/src/index.ts"],
+      "@menog/shared": ["../packages/shared/src/index.ts"],
+      "@menog/core": ["../packages/core/src/index.ts"],
+      "@menog/agents": ["../packages/agents/src/index.ts"],
+      "@menog/event-ledger": ["../packages/event-ledger/src/index.ts"],
+      "@menog/policy": ["../packages/policy/src/index.ts"],
+      "@menog/runtime-linux": ["../packages/runtime-linux/src/index.ts"],
+      "@menog/planner": ["../packages/planner/src/index.ts"],
+      "@menog/commit-engine": ["../packages/commit-engine/src/index.ts"],
+      "@menog/memory": ["../packages/memory/src/index.ts"],
+      "@menog/durable-state": ["../packages/durable-state/src/index.ts"],
+      "@menog/cli": ["../apps/cli/src/index.ts"]
+    },
+    "tsBuildInfoFile": "../dist/tests.tsbuildinfo"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["fixtures"],
+  "references": [
+    { "path": "../packages/verbs" },
+    { "path": "../packages/shared" },
+    { "path": "../packages/algorithms" },
+    { "path": "../packages/semantiq" },
+    { "path": "../packages/core" },
+    { "path": "../packages/agents" },
+    { "path": "../packages/event-ledger" },
+    { "path": "../packages/policy" },
+    { "path": "../packages/runtime-linux" },
+    { "path": "../packages/planner" },
+    { "path": "../packages/commit-engine" },
+    { "path": "../packages/memory" },
+    { "path": "../packages/durable-state" },
+    { "path": "../apps/cli" }
+  ]
+}

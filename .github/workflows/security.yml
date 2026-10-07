@@ -1,0 +1,89 @@
+# Menog OS — dependency / security scanning
+#
+# Scope: dependency advisories for a local-first, zero-trust runtime.
+#
+# Deliberate authoring choices (GP-R12):
+#   * Actions pinned to a MAJOR version tag chosen from the upstream release
+#     list at authoring time — never @main / @master.
+#   * Permissions are read-only. No write token, so no SARIF upload and no
+#     pull-request commenting; findings are read from the job log.
+#   * No repository secret is consumed. No deployment, no release, no registry
+#     publishing.
+#   * `pnpm audit` reads the committed lockfile, so it runs without installing
+#     and without a cache — nothing here can alter lockfile semantics.
+#
+# TWO JOBS ON PURPOSE — they are not the same gate:
+#   * `dependencies-runtime` audits PRODUCTION dependencies only and PASSES
+#     today. It is the one worth making a required check.
+#   * `dependencies-development` audits the full tree including devDependencies
+#     and FAILS today on 14 dev-only advisories (vitest / vite / tinypool /
+#     esbuild / brace-expansion / source-map-js / @vitest/mocker). Track item
+#     R5-HD-5 is the publication gate that requires a clean full audit; until
+#     it is remediated this job is not a candidate for a required check.
+#   Both jobs are left blocking. Neither is wrapped in continue-on-error: a
+#   known-red gate that is reported honestly is more useful than a green one
+#   bought by suppressing the result.
+#
+# SECRET SCANNING IS NOT WIRED IN HERE, deliberately. The canonical pattern
+# list for this repository lives inside scripts/verify-local.mjs, which runs
+# the whole local verification suite; the tree also contains 9 intentional,
+# non-functional secret fixtures. Turning those into a blocking CI secret scan
+# requires a human allowlist decision about the fixtures, so the scan is left
+# to `node scripts/verify-local.mjs` for now. This is a documented omission,
+# not an oversight.
+
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, Mondays 06:00 UTC — catches advisories published after a merge.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  dependencies-runtime:
+    name: dependencies (runtime)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Audit production dependencies
+        run: pnpm audit --prod
+
+  dependencies-development:
+    name: dependencies (development)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      # Expected to fail until R5-HD-5 is remediated. Do not add
+      # continue-on-error here; the advisories are real.
+      - name: Audit all dependencies (including devDependencies)
+        run: pnpm audit

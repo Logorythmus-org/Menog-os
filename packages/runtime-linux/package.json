@@ -1,0 +1,20 @@
+{
+  "name": "@menog/runtime-linux",
+  "version": "0.0.1",
+  "license": "MPL-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@menog/shared": "workspace:*",
+    "@menog/core": "workspace:*",
+    "@menog/event-ledger": "workspace:*",
+    "@menog/verbs": "workspace:*",
+    "@menog/policy": "workspace:*"
+  }
+}

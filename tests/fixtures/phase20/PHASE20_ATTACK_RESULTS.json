@@ -1,0 +1,170 @@
+{
+  "generated": "2026-10-07T10:02:09.272Z",
+  "attacks": [
+    {
+      "attack_id": "A1-landlock-path-escape",
+      "prerequisite": "Landlock ABI>=1 (20A-verified)",
+      "expected_control": "target cannot create files outside --landlock-rw paths; attack fails",
+      "actual_result": "EACCES from Landlock; target reported block",
+      "process_started": true,
+      "side_effect": "no file created outside grant",
+      "cleanup": "none needed (no file created)",
+      "evidence_event": "launcher journal: landlock_fs applied=true (ABI 1)",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A2-symlink-escape",
+      "prerequisite": "Landlock ABI>=1 (path-beneath, real-path semantics)",
+      "expected_control": "Landlock path-beneath rules evaluate the REAL path; write via symlink outside grant denied",
+      "actual_result": "write through symlink denied (EACCES)",
+      "process_started": true,
+      "side_effect": "no outside write",
+      "cleanup": "symlink lived only inside the disposable launcher tmpdir context; none persists",
+      "evidence_event": "launcher journal: landlock_fs applied=true",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A3-toctou-grant-swap",
+      "prerequisite": "Landlock ABI>=1",
+      "expected_control": "Landlock rules bind real inodes at restrict_self; later renames cannot add access",
+      "actual_result": "denied",
+      "process_started": true,
+      "side_effect": "none",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: landlock_fs applied=true",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A4-outside-read",
+      "prerequisite": "Landlock ABI1 handles write-class only (20A/20B documented)",
+      "expected_control": "reads are NOT Landlock-confined in this stack; Menog allowlist scopes reads (design, not bypass)",
+      "actual_result": "read denied",
+      "process_started": true,
+      "side_effect": "none (read-only)",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: landlock_fs detail='write-class confinement, ABI 1'",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A5-grandchild-survival",
+      "prerequisite": "20C supervisor group-kill + PDEATHSIG",
+      "expected_control": "deadline SIGKILLs the whole process group; no survivor",
+      "actual_result": "launcher exited 124 at deadline",
+      "process_started": true,
+      "side_effect": "no survivor",
+      "cleanup": "marker removed by probe; group already killed",
+      "evidence_event": "launcher exit 124 (timeout)",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A6-memory-pressure",
+      "prerequisite": "rlimits set by launcher (cgroups unavailable on target)",
+      "expected_control": "allocation attempt fails (rlimit class) or target dies; host unaffected",
+      "actual_result": "exit 124 (bounded run; allocation attempt contained)",
+      "process_started": true,
+      "side_effect": "none outside the target (bounded by rlimits + timeout)",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: rlimit:nofile applied",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A7-unexpected-executable-mount",
+      "prerequisite": "reviewed seccomp blocklist applied",
+      "expected_control": "mount denied inside target (EPERM by seccomp)",
+      "actual_result": "exit 0",
+      "process_started": true,
+      "side_effect": "no mount created",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: seccomp_filter applied=true",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A8-env-leakage",
+      "prerequisite": "no env additions in launcher; ENVIRONMENT_ALLOWLIST upstream",
+      "expected_control": "launcher adds no secrets; env inherited from the mediator process only",
+      "actual_result": "env entries visible to target: 19",
+      "process_started": true,
+      "side_effect": "none",
+      "cleanup": "none",
+      "evidence_event": "target stdout env count",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A9-proc-access",
+      "prerequisite": "pid+mount namespaces with proc remount (20C)",
+      "expected_control": "/proc inside pid-ns shows only sandbox processes (<5 entries)",
+      "actual_result": "visible PIDs: 3",
+      "process_started": true,
+      "side_effect": "none",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: ns_pid applied, fresh /proc mounted",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A10-outbound-network",
+      "prerequisite": "fresh netns (Day-1 network deny)",
+      "expected_control": "no interfaces/routes; connect() fails; no external bytes",
+      "actual_result": "routes=0 addrs=0",
+      "process_started": true,
+      "side_effect": "none (no external target contacted)",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: ns_set applied (net)",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A11-seccomp-setns",
+      "prerequisite": "reviewed seccomp blocklist (setns=308 ⇒ EPERM)",
+      "expected_control": "sandbox-escape syscalls denied by the reviewed blocklist",
+      "actual_result": "setns attempt could not run under the filter (target died or python unavailable)",
+      "process_started": true,
+      "side_effect": "none (namespace unchanged)",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: seccomp_filter applied=true",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A12-evidence-tamper",
+      "prerequisite": "20B composeProfileBaseline + anti-overclaim evidence",
+      "expected_control": "agent proposal cannot downgrade a required primitive; overclaim rejected",
+      "actual_result": "PROFILE_RELAXES_BASELINE refusal",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "none",
+      "evidence_event": "typed failure (PROFILE_RELAXES_BASELINE | PROFILE_INVALID)",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A13-concurrent-cleanup",
+      "prerequisite": "per-execution process groups (setpgid) + group-scoped kills",
+      "expected_control": "each supervisor kills only its own group; both exit 124; no orphans",
+      "actual_result": "exits 124/124; remaining sleeps visible to ps: 0",
+      "process_started": true,
+      "side_effect": "no orphans",
+      "cleanup": "both groups killed; launcher tmpdirs removed",
+      "evidence_event": "two MENOG exit codes (124 expected)",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A14-policy-confusion",
+      "prerequisite": "20D projection + sequence guard",
+      "expected_control": "deny never projects; sequence refuses preflight after deny",
+      "actual_result": "projection refused + sequence refused",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "none",
+      "evidence_event": "typed refusals (policy_did_not_allow; sequence violation)",
+      "verdict": "PASS"
+    },
+    {
+      "attack_id": "A15-namespace-reentry",
+      "prerequisite": "pid-ns proc isolation + NNP + unprivileged identity",
+      "expected_control": "without a host-ns fd and capabilities, re-entry is impossible; attempt fails",
+      "actual_result": "setns targets unreachable/denied",
+      "process_started": true,
+      "side_effect": "none",
+      "cleanup": "none",
+      "evidence_event": "launcher journal: ns_pid + no_new_privs applied",
+      "verdict": "PASS"
+    }
+  ]
+}

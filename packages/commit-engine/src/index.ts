@@ -1,0 +1,63 @@
+export {
+  COMMIT_CANDIDATE_SCHEMA_VERSION,
+  COMMIT_RISK_LEVELS,
+  type CommitCandidateSchemaVersion,
+  type CommitRiskLevel,
+  type CommitRiskAssessment,
+  type CommitApprovalOutcome,
+  type CommitApproval,
+  type CommitFileChangeKind,
+  type CommitFileChange,
+  type CommitDiffSummary,
+  type CommitTestEvidence,
+  type CommitEnvironment,
+  type CommitCandidate,
+  type CommitCandidateInput,
+  type BuildCommitCandidateResult,
+  type CommitCandidateState,
+  type HumanApprovalDecision,
+  type ApprovalStateTransition,
+  type CandidateApprovalStateRecord,
+  type CanCommitResult,
+} from "./types.js";
+
+export {
+  CommitCandidateBuilder,
+  canonicalSerialize,
+  canonicalHash,
+  newCandidateId,
+  type CommitCandidateBuilderOptions,
+} from "./builder.js";
+
+export {
+  CommitApprovalWorkflow,
+  DEFAULT_APPROVAL_TTL_MS,
+  CRITICAL_APPROVAL_TTL_MS,
+  type CommitApprovalWorkflowOptions,
+  type RegisterCandidateOptions,
+} from "./workflow.js";
+
+export {
+  explainCandidate,
+  generateReplayPlan,
+  compareCandidates,
+  generateRollbackPlan,
+  EVIDENCE_EXPLANATION_SCHEMA_VERSION,
+  ROLLBACK_PLAN_SCHEMA_VERSION,
+  CANDIDATE_COMPARISON_SCHEMA_VERSION,
+  REPLAY_PLAN_SCHEMA_VERSION,
+  REPLAY_ENGINE_OVERCLAIM_GUARD,
+  type EvidenceExplanation,
+  type EvidenceExplanationSection,
+  type ReplayPlan,
+  type ReplayStep,
+  type ReplayStepKind,
+  type CandidateComparison,
+  type CandidateFieldDiff,
+  type FileDiff,
+  type DiffKind,
+  type CandidateStats,
+  type RollbackPlan,
+  type RollbackStep,
+  type RollbackStepKind,
+} from "./evidenceEngine.js";

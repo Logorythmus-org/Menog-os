@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "menog-phase25-adversarial-evidence/v0",
+  "gate": "25G",
+  "suite": "tests/unit/phase25g-adversarial-operational.test.ts",
+  "verdictVocabulary": [
+    "PASS",
+    "FAIL",
+    "UNSUPPORTED",
+    "INCONCLUSIVE"
+  ],
+  "verdictSemantics": "UNSUPPORTED is NOT PASS: recorded when the attack cannot be constructed against any public surface",
+  "scope": "process-local fixtures only; no network, no deployment, no power-loss/hardware claim",
+  "cases": [
+    {
+      "caseId": "AOG-01",
+      "attack": "old/stolen key after rotation (stale key presented for signing/verification)",
+      "expectedControl": "the key-USE gate refuses rotated keys (stale_rotated_key) even though 24B crypto would still verify their signatures; trust inheritance is ALWAYS refused (P7)",
+      "actualResult": "decideKeyUse refused stale_rotated_key; decideTrustInheritance refused (P7); the FRESH identity's record permits use",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-02",
+      "attack": "revoked signature (revoked key used for a signing/verification operation)",
+      "expectedControl": "the key-USE gate refuses revoked keys permanently and revocation SURVIVES a restart reload (reload re-enters state 'revoked')",
+      "actualResult": "decideKeyUse refused state_revoked; reloadLifecycleRecord reloaded EXACTLY 'revoked'; post-reload use refused state_revoked",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-03",
+      "attack": "forged rotation (rotation executed without a request; self-referential rotation reusing the same key)",
+      "expectedControl": "the closed lifecycle machine demands request-before-execute and a GENUINELY FRESH identity; forged/self rotations refuse",
+      "actualResult": "direct jump refused rotation_not_requested; self-referential execution refused rotation_not_fresh",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-04",
+      "attack": "key substitution (attacker presents operations claiming the victim's key id / fingerprint)",
+      "expectedControl": "the lifecycle record canonically re-derives its keyId from the public key and binds the fingerprint; claims that do not match refuse",
+      "actualResult": "keyId claim refused key_id_mismatch; fingerprint claim refused fingerprint_mismatch (both fail closed)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-05",
+      "attack": "remote self-admission (peer message instructs the node to admit the sender)",
+      "expectedControl": "a peer message can never be an admin command: the claim is receivable only as DATA (P1/P2) and the refusal is deterministic; no code path acts on it",
+      "actualResult": "refusePeerCommand('self_admit') refused; the claim was receivable as DATA (claim_within_boundary, grants nothing); classified OT-01 monitor — no execution disposition exists in the closed vocabulary",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-06",
+      "attack": "remote self-unquarantine + rotated-identity trust-inheritance claim",
+      "expectedControl": "quarantined is terminal-facing (no self-exit); rotation NEVER inherits trust (P7): the boundary decision names the violated pin",
+      "actualResult": "both peer commands refused; the rotation_trust_claim crossed the boundary with violatedPin=ROTATION_NO_TRUST_INHERITANCE",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-07",
+      "attack": "stale admin epoch (operator intent minted in an old epoch replayed against the live registry)",
+      "expectedControl": "admin intents are epoch-bound: a stale localEpochId refuses BEFORE any persistence and the peer state is untouched",
+      "actualResult": "intent gate refused stale_admin_epoch; session mutation refused stale_admin_epoch; peer B still admitted (nothing applied)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-08",
+      "attack": "concurrent trust mutation (same transactionId, conflicting reasons; then a flip-back attempt)",
+      "expectedControl": "no last-writer-wins: the duplicate transaction resolves as an idempotent replay (or refusal) at the ORIGINAL state; the quarantined terminal state refuses every flip",
+      "actualResult": "final state is EXACTLY 'quarantined' (the retirement never applied); flip-back refused peer_terminal_state",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-09",
+      "attack": "terminal resurrection (quarantined peer retries enrollment/admission; revoked key asks to return to active)",
+      "expectedControl": "terminal states are unrepresentable exits in BOTH machines (peer trust L6; key lifecycle monotone rank)",
+      "actualResult": "re-enroll and re-admit refused peer_terminal_state; revoked→active refused already_terminal",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-10",
+      "attack": "egress bypass (five candidates trying to smuggle forbidden classes past the 25D gate)",
+      "expectedControl": "the ONE egress gate default-denies: secrets/policy/raw-output/executable refuse the whole candidate; unknown fields refuse",
+      "actualResult": "secret_material=secret_material; raw_hidden_policy=raw_hidden_policy; raw_tool_output=raw_tool_output; executable_material=executable_material; unknown_field=unknown_field",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-11",
+      "attack": "nested leakage (JSON-encoded shell command; PEM key block; key material offered to egress/durable placements)",
+      "expectedControl": "structural strings are parsed and scanned at depth; the 25A key-storage boundary denies private keys in EVERY non-memory placement as FINDINGS",
+      "actualResult": "nested shell refused executable_material; PEM refused secret_material; placements refused private_key_in_egress_denied + private_key_in_evidence_denied",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-12",
+      "attack": "disclosure hash/staleness (manifest bound to a different payload; manifest re-presented for a new payload)",
+      "expectedControl": "the manifest binds to the OUTGOING payload hash: mismatch and staleness refuse fail-closed; a disclosure carries no execution/policy field",
+      "actualResult": "hash_mismatch refused; stale_disclosure refused; the correct binding holds; manifest has no authority fields",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-13",
+      "attack": "proposal→tool reach (admitted proposal offered to the execution gate; static reachability scan)",
+      "expectedControl": "a proposal is inert evidence: the candidate carries authority:'none'/executionAuthorized:false; the gate accepts no proposal-only input; zero execution tokens in the 25A–25F modules",
+      "actualResult": "proposal admitted as evidence; candidate inert (authority none, exec false); gate refused no_local_allocation; static scan across the 4 Phase-25 modules: 0 hits (25F added no production code)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-14",
+      "attack": "foreign evidence authority (foreign anchor offered to the execution gate; a forged 'local_action' anchor with no local Policy)",
+      "expectedControl": "foreign anchors bind as DATA with receiver-judgment fields pinned to local refusal facts; a local_action anchor REQUIRES an explicit LOCAL Policy decision and refuses without one",
+      "actualResult": "foreign anchor pinned not_admitted/none; the forged local_action anchor refused provenance_malformed (an explicit LOCAL Policy result is required); the execution gate refused no_local_allocation",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-15",
+      "attack": "super-agent / capability union (merge federation principals' capabilities into one authority)",
+      "expectedControl": "no public surface expresses capability merging: the 25A pins (P1/P3/P6) and every module expose no merge API",
+      "actualResult": "attack cannot be constructed against any public surface; static scan across 10 modules: 0 merge/union APIs. Recorded UNSUPPORTED — unsupported is NOT PASS",
+      "verdict": "UNSUPPORTED"
+    },
+    {
+      "caseId": "AOG-16",
+      "attack": "alternate durable/network/spawn/listener path (bypass the sanctioned junction, transport off-path, or execute off-path)",
+      "expectedControl": "persistence is ONLY the 23B acceptMutation junction; the Phase-25 modules import no network/spawn/listener primitive",
+      "actualResult": "attack cannot be constructed: static scan across the 4 Phase-25 modules found 0 direct .persist( calls and 0 network/spawn/listener imports (25F added no production code). Recorded UNSUPPORTED — unsupported is NOT PASS",
+      "verdict": "UNSUPPORTED"
+    },
+    {
+      "caseId": "AOG-17",
+      "attack": "crash trust rollback (restore a pre-rotation/pre-revocation lifecycle snapshot after a crash)",
+      "expectedControl": "lifecycle facts are MONOTONE: an earlier snapshot over a dead key refuses (rollback_would_resurrect_key); only equal-state restores are no-ops; forward divergence is a conflict for investigation",
+      "actualResult": "active→revoked refused rollback_would_resurrect_key; rotation_requested→rotated refused likewise; equal-state restored as idempotent no-op; forward divergence refused rollback_conflict",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-18",
+      "attack": "restart replay (the exact admitted envelope replayed after restart; key directory empty)",
+      "expectedControl": "the DURABLE receipt guard refuses before any signature evaluation — replay detection does not depend on keys (no oracle, no key-directory dependence)",
+      "actualResult": "first delivery admitted; post-restart replay refused at stage=replay_freshness failureCode=replay_detected with zero signature evaluation; the durable receipt record exists",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-19",
+      "attack": "downgrade confusion (protocol v0; message schema v9; egress schema v9; lifecycle jump past the request step)",
+      "expectedControl": "exact-equality schema/protocol pins refuse every downgrade at its own stage; the closed lifecycle machine refuses unrequested transitions",
+      "actualResult": "protocol_mismatch (bus) + message-schema refusal (bus) + malformed_candidate (egress) + rotation_not_requested (lifecycle)",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-20",
+      "attack": "Phase-24 confused-deputy regression (a Policy allow minted for agent X presented with agent Y's assignment, post-Phase-25)",
+      "expectedControl": "the 24G repair (policyActorId binding) still holds: the fresh-authorization gate refuses with actor_mismatch",
+      "actualResult": "gate refused actor_mismatch — no Phase-25 change regressed the 24G actor binding",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-21",
+      "attack": "D-24-1 misclassification (call WSL2 native; turn a probe timeout into a skip/downgrade; claim native without a native host)",
+      "expectedControl": "the 25E classifier keeps {windows_host, wsl2, native_linux, unavailable_target} distinct: WSL2 is never native; a timeout records unavailable_target (a fact); native_linux requires the linux platform",
+      "actualResult": "win32+ready → wsl2 (distinct class); win32+timeout → unavailable_target (recorded fact, never a skip); linux → native_linux. No misclassification path exists",
+      "verdict": "PASS"
+    },
+    {
+      "caseId": "AOG-22",
+      "attack": "boundary-claim laundering (execution/key-possession/rotation claims dressed as receivable facts; anonymous claim)",
+      "expectedControl": "the 25A boundary refuses authority-bearing claims naming the violated pin (P3/P6/P7); an anonymous claim cannot even be evaluated; identity claims are receivable DATA that grant nothing",
+      "actualResult": "execution_claim → ADMISSION_NOT_EXECUTION; key_possession_authority_claim → KEY_POSSESSION_NOT_POLICY_ALLOW; rotation_trust_claim → ROTATION_NO_TRUST_INHERITANCE; anonymous refused; identity_claim receivable as DATA",
+      "verdict": "PASS"
+    }
+  ],
+  "summary": {
+    "total": 22,
+    "PASS": 20,
+    "FAIL": 0,
+    "UNSUPPORTED": 2,
+    "INCONCLUSIVE": 0
+  },
+  "criticalBypass": false,
+  "repairActions": [],
+  "runFinishedAtEpochMs": 1791366815463
+}

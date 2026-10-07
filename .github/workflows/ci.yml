@@ -1,0 +1,119 @@
+# Menog OS — continuous integration
+#
+# Deliberate authoring choices (GP-R12):
+#   * Actions are pinned to a MAJOR version tag, chosen from the upstream
+#     release list at authoring time — never @main / @master.
+#   * Permissions are read-only. No job requests a write token.
+#   * No step consumes a repository secret, deploys, or publishes to any
+#     registry (npm, container, or otherwise).
+#   * The pnpm store cache comes from actions/setup-node. Every install step
+#     runs `pnpm install --frozen-lockfile`, so a cache hit or miss can never
+#     change lockfile semantics or dependency resolution.
+#   * `defaults.run.shell: bash` keeps the steps identical on every runner.
+#
+# KNOWN STATE AT AUTHORING (2026-10-06) — read before enabling required checks:
+#   The `test` job is EXPECTED TO FAIL. The published candidate deliberately
+#   excludes docs/release/**, so 25 of its 141 test files cannot resolve the
+#   evidence they assert on (track item R7-HD-1). The failure is genuine, so it
+#   is left blocking and is NOT wrapped in continue-on-error. `install`,
+#   `typecheck` and `build` pass today; `test` is not recommended as a required
+#   check on main until R7-HD-1 is resolved.
+#
+# Node version: the workspace declares engines.node ">=22.0.0". Only Node 24
+# (v24.20.0) has actually been exercised against this candidate, so CI pins 24.
+# A 22/24 matrix is a deliberate follow-up once the 22 leg has been verified.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  install:
+    name: install (frozen lockfile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install with frozen lockfile
+        run: pnpm install --frozen-lockfile
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install with frozen lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install with frozen lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up pnpm (version read from packageManager)
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install with frozen lockfile
+        run: pnpm install --frozen-lockfile
+      # Expected to fail until R7-HD-1 is resolved. Do not add
+      # continue-on-error here; the failure is a real signal, not noise.
+      - name: Test
+        run: pnpm test

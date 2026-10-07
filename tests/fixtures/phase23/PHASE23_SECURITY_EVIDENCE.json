@@ -1,0 +1,246 @@
+{
+  "schema": "menog-phase23-security-evidence/v1",
+  "generated": "2026-10-01",
+  "gate": "23F",
+  "summary": {
+    "total": 23,
+    "pass": 23,
+    "fail": 0,
+    "unsupported_on_target": 0,
+    "inconclusive": 0
+  },
+  "rule": "UNSUPPORTED_ON_TARGET and INCONCLUSIVE never count as PASS",
+  "f10_class": "A23-16 (commit-at-22B / recovery-exclusion / LIVE-block), A23-17 (quarantine terminal + idempotent), A23-18 (no authority from the recovery surface)",
+  "attacks": [
+    {
+      "attack_id": "A23-01",
+      "precondition": "attacker supplies a malformed epoch id",
+      "boundary": "23A epoch pattern + 23B coordinator shape check",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "epoch_refused_stale (23A pattern) / bind=coordinator_epoch_invalid",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-02",
+      "precondition": "a declared/carried epoch id over a fresh store",
+      "boundary": "23A makeRuntimeEpoch (fresh-store + carried-id refusal)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "epoch_refused_stale",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-03",
+      "precondition": "declared id disagrees with the generated id",
+      "boundary": "23A makeRuntimeEpoch (declared/generated mismatch)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "epoch_refused_mismatch",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-04",
+      "precondition": "another epoch id holds the durable live-owner claim",
+      "boundary": "23A split-brain refusal + 23B open-time ownership check",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "epoch_refused_live_owner / bind=coordinator_epoch_mismatch",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-05",
+      "precondition": "a claim that cannot be attributed to an epoch id",
+      "boundary": "23A ambiguous-ownership refusal (L5)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "epoch_refused_unverifiable / epoch_refused_unverifiable",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-06",
+      "precondition": "attacker rewrites the durable claim key to an unattributable value",
+      "boundary": "23B readRuntimeOwnership (attribution before binding)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "garbage→coordinator_epoch_mismatch; cleared→BOUND",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-07",
+      "precondition": "an epoch keeps coordinating after losing the durable claim",
+      "boundary": "per-call ownership re-check (L5) + decisionStillFresh",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "old-coordinator refused=true; new accepted=true; freshness own/new=true/false",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-08",
+      "precondition": "attacker casts a derived kind into the mutation type",
+      "boundary": "23B runtime L8 check (DERIVED_CONTINUITY_KINDS) before staging",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "derived_index=refused,store_checkpoint=refused; store clean=true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-09",
+      "precondition": "attacker forges a committed barrier over a refused/ambiguous mutation",
+      "boundary": "23A advance/visibility law (L4): terminal outcomes never advance",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "rolled=rejected_barrier_not_confirmed; ambiguous=rejected_barrier_not_confirmed; healed=rejected_barrier_not_confirmed",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-10",
+      "precondition": "a committed barrier bound to a different epoch id",
+      "boundary": "23A barrier-recognition check (L5)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "rejected_barrier_not_recognized / durability_barrier_not_recognized",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-11",
+      "precondition": "a non-LIVE lifecycle attempts to admit a committed mutation",
+      "boundary": "23A decideContinuity lifecycle precondition",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "BOOTING=rejected_not_live,RECOVERING=rejected_not_live,RECONCILED=rejected_not_live,READY=rejected_not_live,RECOVERED=rejected_not_live",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-12",
+      "precondition": "the payload carries its own forged coordinatorBinding",
+      "boundary": "23B sealMutationEnvelope (binding applied LAST, always wins)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "sealed epoch=re-000000f10000-bindingepoch0100",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-13",
+      "precondition": "the same transaction id is replayed through the junction",
+      "boundary": "22B transaction-replay denial carried verbatim (no renaming)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "replay=duplicate_transaction; next=ok r2",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-14",
+      "precondition": "revision 2 is staged claiming to supersede revision… itself (stale base)",
+      "boundary": "22B revision-chain conflict (stale writers deny; LWW unrepresentable)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "stale=revision_conflict; next=ok",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-15",
+      "precondition": "mutations are attempted through a closed coordinator",
+      "boundary": "23B close law (unknown_after_error; never visible)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "after=unknown_after_error; stillClosed=true; storeOpen=true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-16",
+      "precondition": "a foreign-shape payload rides the sanctioned junction (F10)",
+      "boundary": "22B payload opacity (frozen) → 22D recovery identity-binding exclusion → 23D quarantine blocks LIVE",
+      "process_started": false,
+      "side_effect": "one disposable store mutated + quarantined record",
+      "cleanup": "temp root removed",
+      "evidence_ref": "committed=true; quarantined=true; class=quarantine; handoff=RECOVERED; authority=recovered_data",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-17",
+      "precondition": "the same store is re-recovered after an F10 quarantine (idempotency attack)",
+      "boundary": "quarantine-as-found preserved at the 22D decision layer; blocking class stable across re-runs",
+      "process_started": false,
+      "side_effect": "none (decision-layer exclusion; no repair)",
+      "cleanup": "temp root removed",
+      "evidence_ref": "first=quarantine; second=quarantine; excluded run1/run2=true/true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-18",
+      "precondition": "recovery blocked by an F10 finding; attacker seeks authority from the recovery surface",
+      "boundary": "22A recovery decision (recovered_data / no authority) + 23D blocked handoff",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "temp root removed",
+      "evidence_ref": "authority=recovered_data; exec=false; policy=false; handoff ok=false; wiring=true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-19",
+      "precondition": "denied-key and identity-drift payloads committed through the junction",
+      "boundary": "23C view re-verification (denied_key_present / invalid_lineage on read)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "denied→denied_key_present; drift→invalid_lineage",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-20",
+      "precondition": "interrupted→done is forged as a transition; a terminal fact is rewritten",
+      "boundary": "23C transition mirror + 22D terminal append-only fact",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "illegal=invalid_task_transition; rewrite=terminal_state_rewrite; viewTerminal=true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-21",
+      "precondition": "four forged evidence variants + one clean control",
+      "boundary": "23D verifyHandoffEvidence (deterministic rebuild + hard-typed semantics)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "authority=false; resume=false; path=false; epoch=false; clean=true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-22",
+      "precondition": "transfer attempts from an unheld claim, to self, and without justification",
+      "boundary": "23B transferOwnership (claim_not_current / epoch_not_new / justification_required)",
+      "process_started": false,
+      "side_effect": "one disposable store mutated",
+      "cleanup": "temp root removed",
+      "evidence_ref": "foreign=claim_not_current; self=epoch_not_new; empty=justification_required; hops=true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A23-23",
+      "precondition": "attacker seeks an authority literal, a transport, or an alternate persist path in Phase-23 modules",
+      "boundary": "structural vocabulary pin (23H §3 scan, now regression-locked)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "authority=0; transport=0; persistSites=1; wiringPersist=0; acceptMutation=1; resume=0",
+      "result": "PASS"
+    }
+  ]
+}

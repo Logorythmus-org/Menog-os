@@ -1,0 +1,45 @@
+# .gitattributes — Menog OS line-ending policy
+# Enforced: LF for all code, docs, config, and data files.
+# No CRLF files are expected in this repository.
+
+# Default: LF for everything
+* text=auto eol=lf
+
+# Explicit LF for code
+*.ts text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+
+# Explicit LF for configs and data
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.svg text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Binary files — no translation
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.wasm binary

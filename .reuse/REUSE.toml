@@ -1,0 +1,126 @@
+# REUSE.toml — Menog OS licensing metadata
+# Classification: PUBLIC (REUSE config)
+# Generated: 2026-09-05 (PROMPT 11A §7)
+# Updated: 2026-10-06 — licence and copyright holder ratified.
+# Status: RATIFIED. Copyright holder of record = "Menog OS contributors".
+#
+# IMPORTANT:
+# - COPYRIGHT_HOLDER_OF_RECORD_DAY1 = "Menog OS contributors" (ratified
+#   2026-10-06; see COPYRIGHT_POLICY.md §Resolved Holder and
+#   IP_DECISION_LOG.md entries IP-001 / IP-002). The label is a collective
+#   attribution and names no legal entity, so it asserts no corporate
+#   ownership.
+# - The annotations below are the REUSE-native declaration of the holder for
+#   paths that cannot carry an in-file header. In-file
+#   `SPDX-FileCopyrightText:` headers on existing Menog source files are
+#   STILL NOT applied: SPDX_REUSE_POLICY.md §Mass-Edit Gating Conditions
+#   requires an explicit human message "APPLY SPDX HEADERS" for that step.
+
+version = 1
+
+# --- Anchors for known third-party texts ---
+
+[annotations."LICENSES/MPL-2.0.txt"]
+SPDX-FileCopyrightText = "© 2012 Mozilla Foundation and individual contributors"
+SPDX-License-Identifier = "MPL-2.0"
+Menog-IP-Classification = "PUBLIC"
+Menog-Provenance = "Canonical text from OSI https://opensource.org/license/mpl-2-0/ and Mozilla https://www.mozilla.org/en-US/MPL/2.0/. Retrieved 2026-09-05. This file is NOT an original Menog work."
+
+[annotations."LICENSE"]
+SPDX-FileCopyrightText = "© 2012 Mozilla Foundation and individual contributors"
+SPDX-License-Identifier = "MPL-2.0"
+Menog-IP-Classification = "PUBLIC"
+Menog-Provenance = "Canonical MPL-2.0 text as above; top-level duplicate for tooling that expects LICENSE at root."
+
+[annotations."LICENSES/CC-BY-4.0.txt"]
+SPDX-FileCopyrightText = "Creative Commons"
+SPDX-License-Identifier = "CC-BY-4.0"
+Menog-IP-Classification = "PUBLIC"
+Menog-Provenance = "Canonical text from https://creativecommons.org/licenses/by/4.0/legalcode.txt. Retrieved 2026-10-06. This file is NOT an original Menog work."
+
+[annotations."LICENSES/CC0-1.0.txt"]
+SPDX-FileCopyrightText = "Creative Commons"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+Menog-Provenance = "Canonical text from https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt. Retrieved 2026-10-06. This file is NOT an original Menog work."
+
+# --- Menog-authored files: NO COPYRIGHT ASSERTION until holder is ratified ---
+# The sections below intentionally omit FileCopyrightText for Menog code/docs.
+# They only record the PROPOSED license identifier for lint purposes.
+# Any automated lint run will flag "missing copyright" — expected until ratification.
+
+[annotations."packages/**/*.ts"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "MPL-2.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."packages/**/*.json"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+Menog-Generated = "false"
+
+[annotations."apps/**/*.ts"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "MPL-2.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."apps/**/*.json"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."tests/**/*.ts"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "MPL-2.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."docs/**/*.md"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC-BY-4.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."security/**/*.md"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC-BY-4.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."templates/**/*.md"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."*.md"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC-BY-4.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."*.json"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."*.yaml"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."*.config.ts"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "MPL-2.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations."tsconfig*.json"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations.".gitignore"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"
+
+[annotations.".npmrc"]
+SPDX-FileCopyrightText = "© 2026 Menog OS contributors"
+SPDX-License-Identifier = "CC0-1.0"
+Menog-IP-Classification = "PUBLIC"

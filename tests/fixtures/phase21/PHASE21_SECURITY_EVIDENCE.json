@@ -1,0 +1,175 @@
+{
+  "schema": "menog-phase21-security-evidence/v1",
+  "generated": "2026-09-27",
+  "gate": "21F",
+  "summary": {
+    "total": 16,
+    "pass": 16,
+    "fail": 0,
+    "unsupported_on_target": 0,
+    "inconclusive": 0
+  },
+  "rule": "UNSUPPORTED_ON_TARGET and INCONCLUSIVE never count as PASS",
+  "attacks": [
+    {
+      "attack_id": "A21-01",
+      "prerequisite": "registered tool.listing@1.0.0",
+      "boundary": "21A gate identity check (toolId+version)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a (no run)",
+      "evidence_ref": "decision:validation_denied",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-02",
+      "prerequisite": "quarantined tool entry",
+      "boundary": "21A gate order 1 (lifecycle)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "decision:validation_denied",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-13",
+      "prerequisite": "two registries, same toolId@version",
+      "boundary": "registry entry pinning (manifestHash per entry)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "hashes:true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-03",
+      "prerequisite": "attacker-supplied manifest claiming write",
+      "boundary": "manifest caps are requests; Policy is the sole authority",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "decision:policy_denied;rule:policy did not allow this execution",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-14",
+      "prerequisite": "untrusted request asserting allow",
+      "boundary": "caller-engine override at the junction",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "decision:policy_denied",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-16",
+      "prerequisite": "role declared beyond its profile",
+      "boundary": "real allocator qualification (unqualified never selected)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "alloc:no_qualified_agent",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-05",
+      "prerequisite": "agent-controlled argv",
+      "boundary": "envelope validation (ARGS_FORBIDDEN)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "5 payloads rejected",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-06",
+      "prerequisite": "agent-controlled cwd",
+      "boundary": "cwd canonicalization + (live) Landlock real-path binding",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "4 payloads rejected",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-07",
+      "prerequisite": "attacker-controlled request object",
+      "boundary": "request type carries no executable-identity field",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "dangerous-fields:0",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-08",
+      "prerequisite": "agent-controlled envAllowlist",
+      "boundary": "ENV_NAME_FORBIDDEN (names only, UPPERCASE shape)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "decision:validation_denied",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-10",
+      "prerequisite": "request demanding wide bounds",
+      "boundary": "registry-pinned limits bind the envelope",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "clamped:true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-11",
+      "prerequisite": "malicious tool output",
+      "boundary": "outputTrust pinned untrusted_data; never interpreted",
+      "process_started": false,
+      "side_effect": "output treated as data only",
+      "cleanup": "n/a",
+      "evidence_ref": "pinned:true",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-15",
+      "prerequisite": "post-run evidence rewrite",
+      "boundary": "canonical recordHash binding + anti-overclaim builder",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "integrity:tampered",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-12",
+      "prerequisite": "attacker seeks egress via tool run",
+      "boundary": "registry network:none + floor netns + Day-1 deny",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "no-network-field:true;live-egress-proven-in-20E-A10",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-09",
+      "prerequisite": "WSL2 target + real launcher",
+      "boundary": "20C supervisor deadline, group-scoped kill",
+      "process_started": true,
+      "side_effect": "bounded /tmp fixture killed at deadline",
+      "cleanup": "process group SIGKILL; zero orphans (A5/A13 + 21C live)",
+      "evidence_ref": "tests/security/phase21-tool-live.test.ts timeout case; probe:referenced",
+      "result": "PASS"
+    },
+    {
+      "attack_id": "A21-04",
+      "prerequisite": "toolRef swapped under a benign skill",
+      "boundary": "per-step tool-cap policy evaluation (deputy confused by nothing)",
+      "process_started": false,
+      "side_effect": "none",
+      "cleanup": "n/a",
+      "evidence_ref": "step:policy_denied",
+      "result": "PASS"
+    }
+  ]
+}
