@@ -151,7 +151,7 @@ Stated plainly, because an honest boundary is more useful than an optimistic one
 
 ## 5. Stack
 
-- **Language:** TypeScript 5.7.2 — strict, composite build, ESM (`"type": "module"`),
+- **Language:** TypeScript 7.0.2 — strict, composite build, ESM (`"type": "module"`),
   `noUncheckedIndexedAccess`, `verbatimModuleSyntax`
 - **Package manager:** pnpm 10.11.1 workspaces (frozen lockfile)
 - **Tests:** Vitest 2.1.9 — **131 physical `*.test.ts` files** (90 unit, 31 security, 10 integration); the approved public CI surface currently runs 110 test files / 3,031 tests
