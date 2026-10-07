@@ -3,8 +3,8 @@
 # Scope: dependency advisories for a local-first, zero-trust runtime.
 #
 # Deliberate authoring choices (GP-R12):
-#   * Actions pinned to a MAJOR version tag chosen from the upstream release
-#     list at authoring time — never @main / @master.
+#   * Actions are pinned to immutable upstream commit SHAs, with the audited
+#     major tag retained as an inline comment for maintainability.
 #   * Permissions are read-only. No write token, so no SARIF upload and no
 #     pull-request commenting; findings are read from the job log.
 #   * No repository secret is consumed. No deployment, no release, no registry
@@ -59,11 +59,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Set up pnpm (version read from packageManager)
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24
       - name: Audit production dependencies
@@ -75,11 +75,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Set up pnpm (version read from packageManager)
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24
       - name: Audit all dependencies (including devDependencies; informational)

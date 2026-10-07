@@ -9,7 +9,7 @@
 #     separately. This workflow does not publish, deploy, or grant merge authority.
 #
 # Deliberate authoring choices:
-#   * Actions use bounded upstream version tags rather than @main / @master.
+#   * Actions are pinned to immutable upstream commit SHAs; audited major tags remain as comments.
 #   * Permissions are read-only. No write token. No secret is consumed.
 #   * No deployment, release, or registry publishing occurs here.
 #   * The third-party check reads pnpm's installed inventory after a frozen-lockfile install.
@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       # The ratified first-party licence surface is expected to be present.
       # Absence of any required artefact is a hard verification failure.
       - name: Require the first-party licence artefacts
@@ -58,11 +58,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Set up pnpm (version read from packageManager)
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24
           cache: pnpm
