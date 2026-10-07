@@ -181,7 +181,8 @@ function attachSession(transport: FramedTransport, socket: Socket): Attached {
   const received: FramedPayload[] = [];
   const failures: RefusalLike[] = [];
   socket.on("data", (chunk) => {
-    const result = opened.session.receive(chunk, Date.now());
+    const bytes = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
+    const result = opened.session.receive(bytes, Date.now());
     if (!result.ok) {
       failures.push(result);
       return;
