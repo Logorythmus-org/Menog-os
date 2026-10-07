@@ -17,7 +17,7 @@
  * written from the ACTUAL results of each run (never hand-copied).
  */
 import { describe, it, expect, afterAll } from "vitest";
-import { mkdtempSync, rmSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DenyByDefaultPolicyEngine } from "@menog/policy";
@@ -91,9 +91,12 @@ afterAll(() => {
     ],
     runFinishedAtEpochMs: Date.now(),
   };
-  const fixtureDir = join(process.cwd(), "tests", "fixtures", "phase24");
-  mkdirSync(fixtureDir, { recursive: true });
-  writeFileSync(join(fixtureDir, "PHASE24_SECURITY_EVIDENCE.json"), JSON.stringify(evidence, null, 2) + "\n", "utf8");
+  const evidenceDir = mkdtempSync(join(tmpdir(), "menog-phase24-evidence-"));
+  try {
+    writeFileSync(join(evidenceDir, "PHASE24_SECURITY_EVIDENCE.json"), JSON.stringify(evidence, null, 2) + "\n", "utf8");
+  } finally {
+    rmSync(evidenceDir, { recursive: true, force: true });
+  }
 });
 
 // ── fixtures ─────────────────────────────────────────────────────────────────
