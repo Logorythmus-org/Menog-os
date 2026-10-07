@@ -106,6 +106,16 @@ Dependabot is allowed to propose updates. It does not have merge authority.
 Automated update PRs must satisfy the same repository checks and human merge gate
 as any other change.
 
+For npm/pnpm dependencies, routine automation is limited to patch/minor version
+updates. Semver-major dependency/toolchain upgrades are treated as explicit
+migration work: open or reference an issue, describe compatibility risks, and
+use a maintainer-controlled migration PR. This policy exists because the first
+Node type-definition and TypeScript major upgrades both required real compatibility
+repairs before CI became green.
+
+GitHub Actions remain monitored by Dependabot, but accepted updates must stay pinned
+to immutable commit SHAs.
+
 ## 6. External contributions
 
 External contributions are open under the public contribution model in

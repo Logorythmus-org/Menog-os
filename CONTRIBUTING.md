@@ -62,6 +62,10 @@ pnpm test
 
 Use the committed lockfile. Do not casually rewrite dependency versions or generated lockfile state.
 
+Patch/minor dependency maintenance may arrive through Dependabot. Semver-major dependency or
+toolchain upgrades should be treated as migration work: open/discuss an issue first, describe
+compatibility risk, and keep the migration in a bounded maintainer-reviewed PR.
+
 ## Branch naming
 
 Use names that describe the work, not the tool or model used:
