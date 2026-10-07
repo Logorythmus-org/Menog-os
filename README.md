@@ -214,8 +214,9 @@ external certification.
 
 ## 8. Evidence and history
 
-Work is organised in numbered phases with per-gate evidence records under `docs/release/`. Two
-things about that history are worth stating plainly rather than burying:
+Historical work is organised in numbered phases with per-gate evidence retained outside this
+public source tree. The public repository carries the resulting status, not the withheld evidence
+archive. Two things about that history are worth stating plainly rather than burying:
 
 1. **The event lineage is disputed, not pristine.** The 29K-R1 integrity failure is recorded above
    and in `docs/release/PHASE29K_R1_RECONCILIATION.json`. Where this repository's evidence is
@@ -223,7 +224,7 @@ things about that history are worth stating plainly rather than burying:
 2. **A document was lost and was not recovered.** On 2026-10-02 an agent tool call overwrote
    `CURRENT_STATE.md` in place, destroying 145,788 bytes of prior content. Recovery was attempted
    and failed: the repository had zero commits, and no backup, shadow copy or recycle-bin entry
-   contained the file. The loss is recorded in `CURRENT_STATE.md` and is the project's own argument
+   contained the file. The loss is recorded in the retained internal state history and is the project's own argument
    for committing work early.
 3. **Most of that evidence is deliberately not included here.** Internal development evidence and
    forensic release records are retained separately from the initial public source release. The
@@ -232,7 +233,7 @@ things about that history are worth stating plainly rather than burying:
    IP-review records. Where the documents above cite `docs/release/…` or those records, they are
    pointing at retained internal material, not at files shipped in this repository.
 
-   **This withholds the records, not the status.** The Phase-29 position stated in §7 is drawn from
+   **This withholds the records, not the status.** The Phase-29 position stated in §3 is drawn from
    those records and is unchanged by their exclusion — it is summarised here precisely because the
    records themselves are not published. The exclusion is deliberate for two reasons: the event
    lineage is disputed and cannot be certified as pristine (point 1), and publishing a selection of
