@@ -19,7 +19,7 @@
  * lifecycle attacks run on the PUBLIC record vocabulary by law).
  */
 import { describe, it, expect, afterAll } from "vitest";
-import { mkdtempSync, rmSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DenyByDefaultPolicyEngine } from "@menog/policy";
@@ -110,9 +110,12 @@ afterAll(() => {
     repairActions: [] as string[],
     runFinishedAtEpochMs: Date.now(),
   };
-  const fixtureDir = join(process.cwd(), "tests", "fixtures", "phase25g");
-  mkdirSync(fixtureDir, { recursive: true });
-  writeFileSync(join(fixtureDir, "PHASE25_SECURITY_EVIDENCE.json"), JSON.stringify(evidence, null, 2) + "\n", "utf8");
+  const evidenceDir = mkdtempSync(join(tmpdir(), "menog-phase25g-evidence-"));
+  try {
+    writeFileSync(join(evidenceDir, "PHASE25_SECURITY_EVIDENCE.json"), JSON.stringify(evidence, null, 2) + "\n", "utf8");
+  } finally {
+    rmSync(evidenceDir, { recursive: true, force: true });
+  }
 });
 
 // ── fixtures ─────────────────────────────────────────────────────────────────

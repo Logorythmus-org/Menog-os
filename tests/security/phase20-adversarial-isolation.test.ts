@@ -14,7 +14,8 @@
 
 import { describe, it, expect, afterAll } from "vitest";
 import { spawnSync } from "node:child_process";
-import { writeFileSync, mkdirSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   MENOG_LAUNCHER_C,
@@ -53,10 +54,13 @@ function record(r: AttackRecord): void {
 }
 
 afterAll(() => {
-  const fixtureDir = join(process.cwd(), "tests", "fixtures", "phase20");
-  mkdirSync(fixtureDir, { recursive: true });
-  const out = join(fixtureDir, "PHASE20_ATTACK_RESULTS.json");
-  writeFileSync(out, JSON.stringify({ generated: new Date().toISOString(), attacks: RESULTS }, null, 2) + "\n");
+  const evidenceDir = mkdtempSync(join(tmpdir(), "menog-phase20-evidence-"));
+  try {
+    const out = join(evidenceDir, "PHASE20_ATTACK_RESULTS.json");
+    writeFileSync(out, JSON.stringify({ generated: new Date().toISOString(), attacks: RESULTS }, null, 2) + "\n");
+  } finally {
+    rmSync(evidenceDir, { recursive: true, force: true });
+  }
 });
 
 // ── launcher harness inside the target ───────────────────────────────────────
