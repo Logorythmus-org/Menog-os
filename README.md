@@ -36,6 +36,8 @@ Menog OS is built around a small set of architectural rules:
 
 ## Architecture
 
+New to the vocabulary? See the [authority and trust glossary](docs/GLOSSARY.md).
+
 ```text
 Human intent
     │
